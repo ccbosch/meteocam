@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Location, LocationSortBy } from '@/types';
 import { useWeather } from '@/hooks/useWeather';
 import { useAppStore } from '@/stores/appStore';
@@ -7,14 +7,57 @@ import { useI18n } from '@/hooks/useI18n';
 
 interface LocationListProps {
   locations: Location[];
+  isDraggable?: boolean;
+  onReorder?: (locationIds: string[]) => Promise<void>;
 }
 
-const LocationList: React.FC<LocationListProps> = ({ locations }) => {
+const LocationList: React.FC<LocationListProps> = ({ locations, isDraggable = false, onReorder }) => {
   const { settings, updateSettings } = useAppStore();
   const { t } = useI18n();
+  const [draggedLocation, setDraggedLocation] = useState<string | null>(null);
+  const [dragOverLocation, setDragOverLocation] = useState<string | null>(null);
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     updateSettings({ locationSortBy: e.target.value as LocationSortBy });
+  };
+
+  const handleDragStart = (locationId: string) => {
+    if (isDraggable) {
+      setDraggedLocation(locationId);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent, locationId: string) => {
+    e.preventDefault();
+    if (draggedLocation && draggedLocation !== locationId && isDraggable) {
+      setDragOverLocation(locationId);
+    }
+  };
+
+  const handleDragEnd = async () => {
+    if (draggedLocation && dragOverLocation && isDraggable && onReorder) {
+      const newOrder = [...locations];
+      const draggedIndex = newOrder.findIndex(loc => loc.id === draggedLocation);
+      const dropIndex = newOrder.findIndex(loc => loc.id === dragOverLocation);
+      
+      if (draggedIndex !== -1 && dropIndex !== -1) {
+        // Remove dragged item
+        const [draggedItem] = newOrder.splice(draggedIndex, 1);
+        // Insert at new position
+        newOrder.splice(dropIndex, 0, draggedItem);
+        
+        // Update order in database
+        const locationIds = newOrder.map(loc => loc.id);
+        await onReorder(locationIds);
+      }
+    }
+    
+    setDraggedLocation(null);
+    setDragOverLocation(null);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverLocation(null);
   };
 
   return (
@@ -35,15 +78,54 @@ const LocationList: React.FC<LocationListProps> = ({ locations }) => {
           <option value="date-asc">{t('list.sortDateAsc')}</option>
         </select>
       </div>
+
+      {isDraggable && locations.length > 1 && (
+        <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center space-x-2 mb-2">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+          </svg>
+          <span>{t('home.dragToReorder')}</span>
+        </div>
+      )}
       
       {locations.map((location) => (
-        <LocationListItem key={location.id} location={location} />
+        <LocationListItem 
+          key={location.id} 
+          location={location}
+          isDraggable={isDraggable}
+          isDragging={draggedLocation === location.id}
+          isDragOver={dragOverLocation === location.id}
+          onDragStart={() => handleDragStart(location.id)}
+          onDragOver={(e) => handleDragOver(e, location.id)}
+          onDragEnd={handleDragEnd}
+          onDragLeave={handleDragLeave}
+        />
       ))}
     </div>
   );
 };
 
-const LocationListItem: React.FC<{ location: Location }> = ({ location }) => {
+interface LocationListItemProps {
+  location: Location;
+  isDraggable?: boolean;
+  isDragging?: boolean;
+  isDragOver?: boolean;
+  onDragStart?: () => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDragEnd?: () => void;
+  onDragLeave?: () => void;
+}
+
+const LocationListItem: React.FC<LocationListItemProps> = ({ 
+  location,
+  isDraggable = false,
+  isDragging = false,
+  isDragOver = false,
+  onDragStart,
+  onDragOver,
+  onDragEnd,
+  onDragLeave,
+}) => {
   const { settings } = useAppStore();
   const { t, language } = useI18n();
   const { weatherData, isLoading, error } = useWeather(
@@ -53,7 +135,38 @@ const LocationListItem: React.FC<{ location: Location }> = ({ location }) => {
   );
 
   return (
-    <div className="card p-4">
+    <div 
+      className={`card p-4 transition-all ${
+        isDragging ? 'opacity-40 scale-95' : ''
+      } ${
+        isDragOver ? 'ring-4 ring-primary-500 scale-[1.02]' : ''
+      } ${
+        isDraggable ? 'cursor-grab active:cursor-grabbing' : ''
+      }`}
+      draggable={isDraggable}
+      onDragStart={(e) => {
+        if (isDraggable && onDragStart) {
+          e.stopPropagation();
+          onDragStart();
+        }
+      }}
+      onDragOver={(e) => {
+        if (isDraggable && onDragOver) {
+          onDragOver(e);
+        }
+      }}
+      onDragEnd={(e) => {
+        if (isDraggable && onDragEnd) {
+          e.stopPropagation();
+          onDragEnd();
+        }
+      }}
+      onDragLeave={() => {
+        if (isDraggable && onDragLeave) {
+          onDragLeave();
+        }
+      }}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4 flex-1">
           <div className="text-2xl">📍</div>

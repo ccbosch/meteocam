@@ -10,26 +10,9 @@ import { useI18n } from '@/hooks/useI18n';
 interface LocationCardProps {
   location: Location;
   onEdit?: (location: Location) => void;
-  isDraggable?: boolean;
-  isDragging?: boolean;
-  isDragOver?: boolean;
-  onDragStart?: () => void;
-  onDragOver?: (e: React.DragEvent) => void;
-  onDragEnd?: () => void;
-  onDragLeave?: () => void;
 }
 
-const LocationCard: React.FC<LocationCardProps> = ({ 
-  location, 
-  onEdit,
-  isDraggable = false,
-  isDragging = false,
-  isDragOver = false,
-  onDragStart,
-  onDragOver,
-  onDragEnd,
-  onDragLeave,
-}) => {
+const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit }) => {
   const { settings } = useAppStore();
   const { t } = useI18n();
   const { weatherData, isLoading: weatherLoading, error: weatherError } = useWeather(
@@ -40,6 +23,9 @@ const LocationCard: React.FC<LocationCardProps> = ({
   
   const [currentWebcamIndex, setCurrentWebcamIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [swipeDistance, setSwipeDistance] = useState<number>(0);
   const currentWebcam = location.webcamUrls[currentWebcamIndex];
   
   const { imageUrl, isLoading: webcamLoading, error: webcamError } = useWebcam(
@@ -61,13 +47,57 @@ const LocationCard: React.FC<LocationCardProps> = ({
     setIsFullscreen(true);
   };
 
+  // Touch gesture handlers for swipe
+  const minSwipeDistance = 50; // Minimum distance for a swipe
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (location.webcamUrls.length <= 1) return;
+    setTouchEnd(null);
+    setSwipeDistance(0);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (location.webcamUrls.length <= 1) return;
+    const currentTouch = e.targetTouches[0].clientX;
+    setTouchEnd(currentTouch);
+    if (touchStart !== null) {
+      setSwipeDistance(touchStart - currentTouch);
+    }
+  };
+
+  const onTouchEnd = () => {
+    if (location.webcamUrls.length <= 1) return;
+    if (!touchStart || !touchEnd) {
+      setSwipeDistance(0);
+      return;
+    }
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe) {
+      nextWebcam();
+    } else if (isRightSwipe) {
+      prevWebcam();
+    }
+    
+    setTouchStart(null);
+    setTouchEnd(null);
+    setSwipeDistance(0);
+  };
+
   const renderCardContent = (fullscreenMode = false) => (
     <>
       {/* Webcam Section */}
       <div
         className={`relative bg-gray-200 dark:bg-gray-700 ${
           fullscreenMode ? 'aspect-[16/9] md:aspect-[21/9]' : 'aspect-video'
-        }`}
+        } ${location.webcamUrls.length > 1 ? 'touch-pan-y' : ''}`}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
       >
         {webcamLoading && (
           <div className="absolute inset-0 flex items-center justify-center">
@@ -87,11 +117,37 @@ const LocationCard: React.FC<LocationCardProps> = ({
         )}
         
         {imageUrl && !webcamLoading && (
-          <img
-            src={imageUrl}
-            alt={`Webcam view of ${location.name}`}
-            className="w-full h-full object-cover"
-          />
+          <>
+            <img
+              src={imageUrl}
+              alt={`Webcam view of ${location.name}`}
+              className="w-full h-full object-cover"
+              style={{
+                transform: swipeDistance !== 0 ? `translateX(${-swipeDistance * 0.3}px)` : 'none',
+                transition: swipeDistance === 0 ? 'transform 0.3s ease-out' : 'none',
+              }}
+            />
+            {/* Swipe visual feedback */}
+            {location.webcamUrls.length > 1 && Math.abs(swipeDistance) > 10 && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className={`bg-black bg-opacity-50 rounded-full p-4 ${
+                  Math.abs(swipeDistance) > 50 ? 'scale-110' : 'scale-100'
+                } transition-transform`}>
+                  <svg 
+                    className="w-12 h-12 text-white" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                    style={{
+                      transform: swipeDistance < 0 ? 'rotate(180deg)' : 'none',
+                    }}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {/* Webcam Navigation */}
@@ -268,37 +324,8 @@ const LocationCard: React.FC<LocationCardProps> = ({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`card overflow-hidden cursor-pointer transition-all ${
-          isDragging ? 'opacity-40 scale-95' : ''
-        } ${
-          isDragOver ? 'ring-4 ring-primary-500 scale-105' : ''
-        } ${
-          isDraggable ? 'cursor-grab active:cursor-grabbing' : ''
-        }`}
+        className="card overflow-hidden cursor-pointer"
         onClick={handleCardClick}
-        draggable={isDraggable}
-        onDragStart={(e) => {
-          if (isDraggable && onDragStart) {
-            e.stopPropagation();
-            onDragStart();
-          }
-        }}
-        onDragOver={(e) => {
-          if (isDraggable && onDragOver) {
-            onDragOver(e);
-          }
-        }}
-        onDragEnd={(e) => {
-          if (isDraggable && onDragEnd) {
-            e.stopPropagation();
-            onDragEnd();
-          }
-        }}
-        onDragLeave={() => {
-          if (isDraggable && onDragLeave) {
-            onDragLeave();
-          }
-        }}
       >
         {renderCardContent(false)}
       </motion.div>

@@ -21,8 +21,6 @@ const HomePage: React.FC = () => {
   const [editingLocation, setEditingLocation] = useState<Location | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [draggedLocation, setDraggedLocation] = useState<string | null>(null);
-  const [dragOverLocation, setDragOverLocation] = useState<string | null>(null);
 
   // Sort locations based on user preference
   const sortedLocations = useMemo(() => {
@@ -72,45 +70,6 @@ const HomePage: React.FC = () => {
     } finally {
       setIsRefreshing(false);
     }
-  };
-
-  const handleDragStart = (locationId: string) => {
-    if (settings.locationSortBy === 'custom') {
-      setDraggedLocation(locationId);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent, locationId: string) => {
-    e.preventDefault();
-    if (draggedLocation && draggedLocation !== locationId && settings.locationSortBy === 'custom') {
-      setDragOverLocation(locationId);
-    }
-  };
-
-  const handleDragEnd = async () => {
-    if (draggedLocation && dragOverLocation && settings.locationSortBy === 'custom') {
-      const newOrder = [...sortedLocations];
-      const draggedIndex = newOrder.findIndex(loc => loc.id === draggedLocation);
-      const dropIndex = newOrder.findIndex(loc => loc.id === dragOverLocation);
-      
-      if (draggedIndex !== -1 && dropIndex !== -1) {
-        // Remove dragged item
-        const [draggedItem] = newOrder.splice(draggedIndex, 1);
-        // Insert at new position
-        newOrder.splice(dropIndex, 0, draggedItem);
-        
-        // Update order in database
-        const locationIds = newOrder.map(loc => loc.id);
-        await LocationService.reorderLocations(locationIds);
-      }
-    }
-    
-    setDraggedLocation(null);
-    setDragOverLocation(null);
-  };
-
-  const handleDragLeave = () => {
-    setDragOverLocation(null);
   };
 
   if (isLoading && locations.length === 0) {
@@ -177,35 +136,26 @@ const HomePage: React.FC = () => {
       </div>
 
       {currentView === 'grid' && (
-        <>
-          {settings.locationSortBy === 'custom' && sortedLocations.length > 1 && (
-            <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center space-x-2 mb-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-              </svg>
-              <span>{t('home.dragToReorder')}</span>
-            </div>
-          )}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sortedLocations.map((location) => (
-              <LocationCard 
-                key={`${location.id}-${refreshKey}`}
-                location={location}
-                onEdit={handleEditLocation}
-                isDraggable={settings.locationSortBy === 'custom'}
-                isDragging={draggedLocation === location.id}
-                isDragOver={dragOverLocation === location.id}
-                onDragStart={() => handleDragStart(location.id)}
-                onDragOver={(e) => handleDragOver(e, location.id)}
-                onDragEnd={handleDragEnd}
-                onDragLeave={handleDragLeave}
-              />
-            ))}
-          </div>
-        </>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sortedLocations.map((location) => (
+            <LocationCard 
+              key={`${location.id}-${refreshKey}`}
+              location={location}
+              onEdit={handleEditLocation}
+            />
+          ))}
+        </div>
       )}
 
-      {currentView === 'list' && <LocationList locations={sortedLocations} />}
+      {currentView === 'list' && (
+        <LocationList 
+          locations={sortedLocations}
+          isDraggable={settings.locationSortBy === 'custom'}
+          onReorder={async (locationIds: string[]) => {
+            await LocationService.reorderLocations(locationIds);
+          }}
+        />
+      )}
 
       {currentView === 'map' && <MapView locations={sortedLocations} />}
 
