@@ -573,41 +573,65 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit, onLocatio
 
                       {weatherData && !weatherLoading && (
                         <>
-                          {/* Current Weather Summary + Details side by side */}
-                          <div className="flex items-start gap-4 mb-6 pb-6 border-b border-gray-200 dark:border-gray-600">
-                            {/* Left: icon + temp + description */}
-                            <div className="flex items-start space-x-3 flex-shrink-0">
-                              <img
-                                src={WeatherService.getWeatherIconUrl(weatherData.current.weatherIcon)}
-                                alt={weatherData.current.weatherDescription}
-                                className="w-16 h-16"
-                              />
-                              <div>
-                                <div className="text-4xl font-bold">
-                                  {Math.round(
-                                    WeatherService.convertTemp(
-                                      weatherData.current.temp,
-                                      settings.temperatureUnit
-                                    )
-                                  )}
-                                  °{settings.temperatureUnit === 'celsius' ? 'C' : 'F'}
+                          {/* Current Weather Summary + Details */}
+                          <div className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-600">
+                            <div className="flex items-start gap-4">
+                              {/* Left: icon + temp + description */}
+                              <div className="flex items-start space-x-3 flex-shrink-0">
+                                <img
+                                  src={WeatherService.getWeatherIconUrl(weatherData.current.weatherIcon)}
+                                  alt={weatherData.current.weatherDescription}
+                                  className="w-16 h-16"
+                                />
+                                <div>
+                                  <div className="text-4xl font-bold">
+                                    {Math.round(
+                                      WeatherService.convertTemp(
+                                        weatherData.current.temp,
+                                        settings.temperatureUnit
+                                      )
+                                    )}
+                                    °{settings.temperatureUnit === 'celsius' ? 'C' : 'F'}
+                                  </div>
+                                  <div className="text-base text-gray-600 dark:text-gray-400 capitalize">
+                                    {weatherData.current.weatherDescription}
+                                  </div>
+                                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                                    {t('location.feelsLike')} {Math.round(
+                                      WeatherService.convertTemp(
+                                        weatherData.current.feelsLike,
+                                        settings.temperatureUnit
+                                      )
+                                    )}°
+                                  </div>
                                 </div>
-                                <div className="text-base text-gray-600 dark:text-gray-400 capitalize">
-                                  {weatherData.current.weatherDescription}
+                              </div>
+
+                              {/* Right: 4 stats — only on md+ */}
+                              <div className="hidden md:flex flex-1 items-center justify-around ml-4 border-l border-gray-200 dark:border-gray-600 pl-4">
+                                <div className="text-center">
+                                  <div className="text-xs text-gray-500 mb-0.5">💧 {t('location.humidity')}</div>
+                                  <div className="text-sm font-semibold">{weatherData.current.humidity}%</div>
                                 </div>
-                                <div className="text-sm text-gray-500 dark:text-gray-400">
-                                  {t('location.feelsLike')} {Math.round(
-                                    WeatherService.convertTemp(
-                                      weatherData.current.feelsLike,
-                                      settings.temperatureUnit
-                                    )
-                                  )}°
+                                <div className="text-center">
+                                  <div className="text-xs text-gray-500 mb-0.5">💨 {t('location.windSpeed')}</div>
+                                  <div className="text-sm font-semibold">
+                                    {Math.round(WeatherService.convertWindSpeed(weatherData.current.windSpeed, settings.windSpeedUnit))}{' '}{settings.windSpeedUnit}
+                                  </div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="text-xs text-gray-500 mb-0.5">🌡️ {t('location.pressure')}</div>
+                                  <div className="text-sm font-semibold">{weatherData.current.pressure} hPa</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="text-xs text-gray-500 mb-0.5">👁️ {t('location.visibility')}</div>
+                                  <div className="text-sm font-semibold">{Math.round(weatherData.current.visibility / 1000)} km</div>
                                 </div>
                               </div>
                             </div>
 
-                            {/* Right: 4 stats */}
-                            <div className="flex-1 flex items-center justify-around ml-4 border-l border-gray-200 dark:border-gray-600 pl-4">
+                            {/* 4 stats on new line — only on mobile */}
+                            <div className="flex md:hidden justify-around mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
                               <div className="text-center">
                                 <div className="text-xs text-gray-500 mb-0.5">💧 {t('location.humidity')}</div>
                                 <div className="text-sm font-semibold">{weatherData.current.humidity}%</div>
@@ -615,13 +639,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit, onLocatio
                               <div className="text-center">
                                 <div className="text-xs text-gray-500 mb-0.5">💨 {t('location.windSpeed')}</div>
                                 <div className="text-sm font-semibold">
-                                  {Math.round(
-                                    WeatherService.convertWindSpeed(
-                                      weatherData.current.windSpeed,
-                                      settings.windSpeedUnit
-                                    )
-                                  )}{' '}
-                                  {settings.windSpeedUnit}
+                                  {Math.round(WeatherService.convertWindSpeed(weatherData.current.windSpeed, settings.windSpeedUnit))}{' '}{settings.windSpeedUnit}
                                 </div>
                               </div>
                               <div className="text-center">
