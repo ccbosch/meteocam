@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Location } from '@/types';
+import { Location, ViewMode } from '@/types';
 import { useLocations } from '@/hooks/useLocations';
 import { useAppStore } from '@/stores/appStore';
 import LocationCard from './LocationCard';
@@ -11,14 +11,16 @@ import EmptyState from './EmptyState';
 import { useI18n } from '@/hooks/useI18n';
 import { db } from '@/db/schema';
 import { LocationService } from '@/services/LocationService';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const HomePage: React.FC = () => {
   const { locations, isLoading } = useLocations();
-  const { currentView, settings } = useAppStore();
+  const { currentView, settings, setCurrentView, setHighlightedLocationId } = useAppStore();
   const { t } = useI18n();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingLocation, setEditingLocation] = useState<Location | null>(null);
+  const [selectedMapLocation, setSelectedMapLocation] = useState<Location | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -46,6 +48,24 @@ const HomePage: React.FC = () => {
   const handleEditLocation = (location: Location) => {
     setEditingLocation(location);
     setIsEditModalOpen(true);
+  };
+
+  const handleMapLocationClick = (location: Location) => {
+    setSelectedMapLocation(location);
+  };
+
+  const handleLocationNameClick = (location: Location, targetView: ViewMode = 'list') => {
+    setCurrentView(targetView);
+    setHighlightedLocationId(location.id);
+    
+    // Clear highlight after 2 seconds
+    setTimeout(() => {
+      setHighlightedLocationId(null);
+    }, 2000);
+  };
+
+  const handleMapLocationNameClick = (location: Location) => {
+    handleLocationNameClick(location, 'grid');
   };
 
   const handleEditSaved = () => {
@@ -142,6 +162,7 @@ const HomePage: React.FC = () => {
               key={`${location.id}-${refreshKey}`}
               location={location}
               onEdit={handleEditLocation}
+              onLocationNameClick={handleLocationNameClick}
             />
           ))}
         </div>
@@ -157,7 +178,13 @@ const HomePage: React.FC = () => {
         />
       )}
 
-      {currentView === 'map' && <MapView locations={sortedLocations} />}
+      {currentView === 'map' && (
+        <MapView 
+          locations={sortedLocations} 
+          onLocationClick={handleMapLocationClick}
+          onLocationNameClick={handleMapLocationNameClick}
+        />
+      )}
 
       <AddLocationModal
         isOpen={isAddModalOpen}
@@ -173,7 +200,75 @@ const HomePage: React.FC = () => {
         }}
         onSave={handleEditSaved}
       />
+
+      {/* Map Location Card Modal */}
+      <AnimatePresence>
+        {selectedMapLocation && (
+          <MapLocationCardModal
+            location={selectedMapLocation}
+            onClose={() => setSelectedMapLocation(null)}
+            onEdit={handleEditLocation}
+            onLocationNameClick={handleLocationNameClick}
+          />
+        )}
+      </AnimatePresence>
     </div>
+  );
+};
+
+// Modal component to show location card from map
+interface MapLocationCardModalProps {
+  location: Location;
+  onClose: () => void;
+  onEdit: (location: Location) => void;
+  onLocationNameClick?: (location: Location) => void;
+}
+
+const MapLocationCardModal: React.FC<MapLocationCardModalProps> = ({ location, onClose, onEdit, onLocationNameClick }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50"
+    >
+      <div
+        className="absolute inset-0 bg-black/80"
+        onClick={onClose}
+      />
+      <div className="relative h-full overflow-y-auto p-4 md:p-8">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="fixed top-4 right-4 z-10 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-full p-3 shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          aria-label="Close"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        
+        <motion.div
+          initial={{ scale: 0.96, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.96, opacity: 0 }}
+          className="mx-auto w-full max-w-4xl"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <LocationCard 
+            location={location}
+            onEdit={(loc) => {
+              onClose();
+              onEdit(loc);
+            }}
+            onLocationNameClick={(loc) => {
+              onClose();
+              onLocationNameClick?.(loc);
+            }}
+          />
+        </motion.div>
+      </div>
+    </motion.div>
   );
 };
 

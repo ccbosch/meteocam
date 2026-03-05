@@ -4,6 +4,7 @@ export interface Location {
   name: string;
   latitude: number;
   longitude: number;
+  postalCode?: string;
   webcamUrls: WebcamSource[];
   addedAt: Date;
   order: number;

@@ -12,7 +12,7 @@ interface LocationListProps {
 }
 
 const LocationList: React.FC<LocationListProps> = ({ locations, isDraggable = false, onReorder }) => {
-  const { settings, updateSettings } = useAppStore();
+  const { settings, highlightedLocationId, updateSettings } = useAppStore();
   const { t } = useI18n();
   const [draggedLocation, setDraggedLocation] = useState<string | null>(null);
   const [dragOverLocation, setDragOverLocation] = useState<string | null>(null);
@@ -95,6 +95,7 @@ const LocationList: React.FC<LocationListProps> = ({ locations, isDraggable = fa
           isDraggable={isDraggable}
           isDragging={draggedLocation === location.id}
           isDragOver={dragOverLocation === location.id}
+          isHighlighted={highlightedLocationId === location.id}
           onDragStart={() => handleDragStart(location.id)}
           onDragOver={(e) => handleDragOver(e, location.id)}
           onDragEnd={handleDragEnd}
@@ -110,6 +111,7 @@ interface LocationListItemProps {
   isDraggable?: boolean;
   isDragging?: boolean;
   isDragOver?: boolean;
+  isHighlighted?: boolean;
   onDragStart?: () => void;
   onDragOver?: (e: React.DragEvent) => void;
   onDragEnd?: () => void;
@@ -121,6 +123,7 @@ const LocationListItem: React.FC<LocationListItemProps> = ({
   isDraggable = false,
   isDragging = false,
   isDragOver = false,
+  isHighlighted = false,
   onDragStart,
   onDragOver,
   onDragEnd,
@@ -140,6 +143,8 @@ const LocationListItem: React.FC<LocationListItemProps> = ({
         isDragging ? 'opacity-40 scale-95' : ''
       } ${
         isDragOver ? 'ring-4 ring-primary-500 scale-[1.02]' : ''
+      } ${
+        isHighlighted ? 'ring-4 ring-yellow-400 dark:ring-yellow-500 shadow-lg' : ''
       } ${
         isDraggable ? 'cursor-grab active:cursor-grabbing' : ''
       }`}

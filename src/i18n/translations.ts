@@ -60,6 +60,12 @@ export type TranslationKey =
   | 'list.sortCustom'
   | 'location.webcamUnavailable'
   | 'location.weatherUnavailable'
+  | 'location.feelsLike'
+  | 'location.humidity'
+  | 'location.windSpeed'
+  | 'location.pressure'
+  | 'location.visibility'
+  | 'location.forecast'
   | 'add.title'
   | 'add.searchCity'
   | 'add.mapPicker'
@@ -115,6 +121,8 @@ export type TranslationKey =
   | 'add.gpsTimeout'
   | 'add.gpsUnknownError'
   | 'edit.title'
+  | 'edit.postalCode'
+  | 'edit.postalCodePlaceholder'
   | 'edit.searchingWebcams'
   | 'edit.foundNearby'
   | 'edit.foundCount'
@@ -196,6 +204,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     'list.sortCustom': 'Custom order',
     'location.webcamUnavailable': 'Webcam unavailable',
     'location.weatherUnavailable': 'Weather data unavailable',
+    'location.feelsLike': 'Feels like',
+    'location.humidity': 'Humidity',
+    'location.windSpeed': 'Wind speed',
+    'location.pressure': 'Pressure',
+    'location.visibility': 'Visibility',
+    'location.forecast': '4-Day Forecast',
     'add.title': 'Add Location',
     'add.searchCity': 'Search City',
     'add.mapPicker': 'Map Picker',
@@ -251,6 +265,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     'add.gpsTimeout': 'GPS location request timed out. Please try again.',
     'add.gpsUnknownError': 'Unable to retrieve GPS location.',
     'edit.title': 'Edit Location',
+    'edit.postalCode': 'Postal Code',
+    'edit.postalCodePlaceholder': 'e.g. 75001',
     'edit.searchingWebcams': 'Searching for nearby webcams...',
     'edit.foundNearby': 'Found Webcams Nearby',
     'edit.foundCount': '{count} found',
@@ -331,6 +347,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     'list.sortCustom': 'Ordre personnalise',
     'location.webcamUnavailable': 'Webcam indisponible',
     'location.weatherUnavailable': 'Donnees meteo indisponibles',
+    'location.feelsLike': 'Ressenti',
+    'location.humidity': 'Humidite',
+    'location.windSpeed': 'Vitesse du vent',
+    'location.pressure': 'Pression',
+    'location.visibility': 'Visibilite',
+    'location.forecast': 'Previsions 4 jours',
     'add.title': 'Ajouter un lieu',
     'add.searchCity': 'Rechercher une ville',
     'add.mapPicker': 'Selection sur carte',
@@ -386,6 +408,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     'add.errorInvalidCoords': 'Coordonnees invalides. Latitude entre -90 et 90, longitude entre -180 et 180.',
     'add.errorSelectMapLocation': 'Veuillez cliquer sur la carte pour selectionner un lieu.',
     'edit.title': 'Modifier le lieu',
+    'edit.postalCode': 'Code postal',
+    'edit.postalCodePlaceholder': 'ex. 75001',
     'edit.searchingWebcams': 'Recherche de webcams a proximite...',
     'edit.foundNearby': 'Webcams trouvees a proximite',
     'edit.foundCount': '{count} trouvees',

@@ -17,6 +17,7 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
   const { showAlert } = useDialog();
   const { t } = useI18n();
   const [locationName, setLocationName] = useState('');
+  const [postalCode, setPostalCode] = useState('');
   const [webcamUrls, setWebcamUrls] = useState<Array<{ url: string; name: string }>>([]);
   const [isSearchingWebcams, setIsSearchingWebcams] = useState(false);
   const [foundWebcams, setFoundWebcams] = useState<Array<{ url: string; name: string; source: string }>>([]);
@@ -26,6 +27,7 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
   useEffect(() => {
     if (location && isOpen) {
       setLocationName(location.name);
+      setPostalCode(location.postalCode || '');
       setWebcamUrls(location.webcamUrls.map(w => ({ url: w.url, name: w.name || '' })));
       setFoundWebcams([]);
       setError(null);
@@ -89,6 +91,7 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
     try {
       await LocationService.updateLocation(location.id, {
         name: locationName,
+        postalCode: postalCode.trim() || undefined,
         webcamUrls: validWebcams.map(w => ({
           id: undefined as any, // Will be preserved by the service
           ...w
@@ -147,15 +150,27 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
 
             <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-4">
               {/* Location Info */}
-              <div>
-                <label className="block text-sm font-medium mb-2">{t('add.locationName')}</label>
-                <input
-                  type="text"
-                  value={locationName}
-                  onChange={(e) => setLocationName(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
-                  required
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">{t('add.locationName')}</label>
+                  <input
+                    type="text"
+                    value={locationName}
+                    onChange={(e) => setLocationName(e.target.value)}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">{t('edit.postalCode')}</label>
+                  <input
+                    type="text"
+                    value={postalCode}
+                    onChange={(e) => setPostalCode(e.target.value)}
+                    placeholder={t('edit.postalCodePlaceholder')}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
+                  />
+                </div>
               </div>
 
               {/* Webcam Search Results */}

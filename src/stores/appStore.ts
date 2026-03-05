@@ -7,10 +7,12 @@ interface AppState {
   currentView: ViewMode;
   isOnline: boolean;
   isInstallPromptVisible: boolean;
+  highlightedLocationId: string | null;
   updateSettings: (settings: Partial<AppSettings>) => void;
   setCurrentView: (view: ViewMode) => void;
   setIsOnline: (isOnline: boolean) => void;
   setIsInstallPromptVisible: (visible: boolean) => void;
+  setHighlightedLocationId: (id: string | null) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -30,6 +32,7 @@ export const useAppStore = create<AppState>()(
       currentView: 'grid',
       isOnline: navigator.onLine,
       isInstallPromptVisible: false,
+      highlightedLocationId: null,
       updateSettings: (newSettings) =>
         set((state) => ({
           settings: { ...state.settings, ...newSettings },
@@ -37,6 +40,7 @@ export const useAppStore = create<AppState>()(
       setCurrentView: (view) => set({ currentView: view }),
       setIsOnline: (isOnline) => set({ isOnline }),
       setIsInstallPromptVisible: (visible) => set({ isInstallPromptVisible: visible }),
+      setHighlightedLocationId: (id) => set({ highlightedLocationId: id }),
     }),
     {
       name: 'meteocam-storage',
