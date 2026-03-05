@@ -533,23 +533,9 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit, onLocatio
                   {/* Weather Forecast Section - Bottom */}
                   <div className="border-t border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 overflow-y-auto flex-1">
                     <div className="p-4 md:p-6">
-                      {/* Location Title and Weather Provider Links */}
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                      {/* Location Title */}
+                      <div className="mb-4">
                         <h3 className="text-xl font-semibold">{location.name}</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {weatherProviders.map((provider) => (
-                            <a
-                              key={provider.id}
-                              href={provider.url(location.latitude, location.longitude)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-xs px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-600 hover:border-primary-500 hover:text-primary-600 dark:hover:border-primary-400 dark:hover:text-primary-400 transition-colors bg-gray-50 dark:bg-gray-700"
-                            >
-                              {provider.name} ↗
-                            </a>
-                          ))}
-                        </div>
                       </div>
 
                       {/* Current Weather */}
@@ -711,6 +697,22 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit, onLocatio
                           </div>
                         </>
                       )}
+
+                      {/* Provider Links — always at bottom */}
+                      <div className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
+                        {weatherProviders.map((provider) => (
+                          <a
+                            key={provider.id}
+                            href={provider.url(location.latitude, location.longitude)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-xs px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-600 hover:border-primary-500 hover:text-primary-600 dark:hover:border-primary-400 dark:hover:text-primary-400 transition-colors bg-gray-50 dark:bg-gray-700"
+                          >
+                            {provider.name} ↗
+                          </a>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
