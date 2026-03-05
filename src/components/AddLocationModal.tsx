@@ -36,6 +36,8 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
   const [isSearchingWebcams, setIsSearchingWebcams] = useState(false);
   const [foundWebcams, setFoundWebcams] = useState<Array<{ url: string; name: string; source: string }>>([]);
   const [webcamSuggestions, setWebcamSuggestions] = useState<string[]>([]);
+  const [isLocatingGPS, setIsLocatingGPS] = useState(false);
+  const [hasTriedAutoLocate, setHasTriedAutoLocate] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -132,6 +134,60 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
     setWebcamUrls([...webcamUrls.filter(w => w.url.trim()), { url: webcam.url, name: webcam.name }]);
   };
 
+  const updateMapSelection = (lat: number, lon: number, mapInstance?: L.Map) => {
+    setMapLat(lat);
+    setMapLon(lon);
+    setSearchError(null);
+
+    const map = mapInstance || mapRef.current;
+    if (!map) return;
+
+    if (markerRef.current) {
+      markerRef.current.remove();
+    }
+
+    markerRef.current = L.marker([lat, lon]).addTo(map);
+    map.setView([lat, lon], 13);
+  };
+
+  const locateWithGPS = (mapInstance?: L.Map) => {
+    if (!navigator.geolocation) {
+      setSearchError(t('add.gpsNotSupported'));
+      return;
+    }
+
+    setIsLocatingGPS(true);
+    setSearchError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        updateMapSelection(latitude, longitude, mapInstance);
+        setLocationName((prev) => (prev.trim() ? prev : t('add.myLocationName')));
+        setIsLocatingGPS(false);
+      },
+      (error) => {
+        let message = t('add.gpsUnknownError');
+
+        if (error.code === error.PERMISSION_DENIED) {
+          message = t('add.gpsPermissionDenied');
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          message = t('add.gpsPositionUnavailable');
+        } else if (error.code === error.TIMEOUT) {
+          message = t('add.gpsTimeout');
+        }
+
+        setSearchError(message);
+        setIsLocatingGPS(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 60000,
+      }
+    );
+  };
+
   // Initialize map when mode changes to 'map'
   useEffect(() => {
     if (mode === 'map' && isOpen && mapContainerRef.current && !mapRef.current) {
@@ -146,17 +202,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
       // Click handler
       map.on('click', (e: L.LeafletMouseEvent) => {
         const { lat, lng } = e.latlng;
-        setMapLat(lat);
-        setMapLon(lng);
-        setSearchError(null);
-
-        // Remove old marker
-        if (markerRef.current) {
-          markerRef.current.remove();
-        }
-
-        // Add new marker
-        markerRef.current = L.marker([lat, lng]).addTo(map);
+        updateMapSelection(lat, lng, map);
       });
 
       mapRef.current = map;
@@ -165,6 +211,13 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
       setTimeout(() => {
         map.invalidateSize();
       }, 100);
+
+      const isMobileDevice =
+        window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
+      if (isMobileDevice && !hasTriedAutoLocate) {
+        setHasTriedAutoLocate(true);
+        locateWithGPS(map);
+      }
     }
 
     // Cleanup map when switching modes or closing
@@ -175,7 +228,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
         markerRef.current = null;
       }
     };
-  }, [mode, isOpen]);
+  }, [mode, isOpen, hasTriedAutoLocate]);
 
   const addWebcamField = () => {
     setWebcamUrls([...webcamUrls, { url: '', name: '' }]);
@@ -263,6 +316,8 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
     setFoundWebcams([]);
     setWebcamSuggestions([]);
     setIsSearchingWebcams(false);
+    setIsLocatingGPS(false);
+    setHasTriedAutoLocate(false);
     onClose();
   };
 
@@ -503,6 +558,15 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                     required
                   />
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => locateWithGPS()}
+                  disabled={isLocatingGPS}
+                  className="btn-secondary w-full"
+                >
+                  {isLocatingGPS ? t('add.locating') : t('add.useCurrentLocation')}
+                </button>
 
                 {/* Map Container */}
                 <div 

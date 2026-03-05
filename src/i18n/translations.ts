@@ -97,6 +97,14 @@ export type TranslationKey =
   | 'add.errorNoLocations'
   | 'add.errorInvalidCoords'
   | 'add.errorSelectMapLocation'
+  | 'add.useCurrentLocation'
+  | 'add.locating'
+  | 'add.myLocationName'
+  | 'add.gpsNotSupported'
+  | 'add.gpsPermissionDenied'
+  | 'add.gpsPositionUnavailable'
+  | 'add.gpsTimeout'
+  | 'add.gpsUnknownError'
   | 'edit.title'
   | 'edit.searchingWebcams'
   | 'edit.foundNearby'
@@ -216,6 +224,14 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     'add.errorNoLocations': 'No locations found. Try searching for a city name (e.g., "Paris", "Tokyo", "New York")',
     'add.errorInvalidCoords': 'Invalid coordinates. Latitude must be between -90 and 90, longitude between -180 and 180.',
     'add.errorSelectMapLocation': 'Please click on the map to select a location.',
+    'add.useCurrentLocation': 'Use my GPS location',
+    'add.locating': 'Locating...',
+    'add.myLocationName': 'My location',
+    'add.gpsNotSupported': 'GPS is not supported on this device/browser.',
+    'add.gpsPermissionDenied': 'Location permission denied. Please allow GPS access.',
+    'add.gpsPositionUnavailable': 'Unable to determine your current location.',
+    'add.gpsTimeout': 'GPS location request timed out. Please try again.',
+    'add.gpsUnknownError': 'Unable to retrieve GPS location.',
     'edit.title': 'Edit Location',
     'edit.searchingWebcams': 'Searching for nearby webcams...',
     'edit.foundNearby': 'Found Webcams Nearby',
@@ -326,6 +342,14 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     'add.urlHint': 'Ajoutez des URLs d images directes de webcams publiques (JPEG, PNG, etc.)',
     'add.cancel': 'Annuler',
     'add.adding': 'Ajout...',
+    'add.useCurrentLocation': 'Utiliser ma position GPS',
+    'add.locating': 'Localisation...',
+    'add.myLocationName': 'Ma position',
+    'add.gpsNotSupported': 'Le GPS n est pas pris en charge sur cet appareil/navigateur.',
+    'add.gpsPermissionDenied': 'Autorisation de localisation refusee. Veuillez autoriser l acces GPS.',
+    'add.gpsPositionUnavailable': 'Impossible de determiner votre position actuelle.',
+    'add.gpsTimeout': 'La demande de position GPS a expire. Veuillez reessayer.',
+    'add.gpsUnknownError': 'Impossible de recuperer la position GPS.',
     'add.addLocation': 'Ajouter un lieu',
     'add.webcamRequiredTitle': 'Webcam requise',
     'add.webcamRequiredMessage': 'Veuillez ajouter au moins une URL de webcam pour continuer.',
