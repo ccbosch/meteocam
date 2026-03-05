@@ -63,15 +63,15 @@ export class WebcamSearchService {
     }
 
     const radius = 50; // 50km radius
-    // In development, use the Vite proxy to bypass CORS
-    // In production, use the direct API (make sure CORS is configured on backend or use a backend proxy)
-    const isDev = import.meta.env.DEV;
-    const baseUrl = isDev 
-      ? `/api/windy/v2/list/nearby=${lat},${lon},${radius}?show=webcams:image,location&key=${apiKey}`
-      : `https://api.windy.com/api/webcams/v2/list/nearby=${lat},${lon},${radius}?show=webcams:image,location&key=${apiKey}`;
+    const url = `https://api.windy.com/webcams/api/v3/webcams?nearby=${lat},${lon},${radius}&limit=20&include=images,location`;
 
     try {
-      const response = await fetch(baseUrl);
+      const response = await fetch(url, {
+        headers: {
+          'x-windy-api-key': apiKey,
+        },
+      });
+
       if (!response.ok) {
         console.warn(`Windy API returned status ${response.status}`);
         return [];
@@ -79,21 +79,23 @@ export class WebcamSearchService {
 
       const data = await response.json();
       
-      if (!data.result?.webcams) {
+      if (!data.webcams || !Array.isArray(data.webcams)) {
         return [];
       }
 
-      return data.result.webcams.map((cam: any) => ({
-        url: cam.image.current.preview,
-        name: cam.title || 'Webcam',
-        source: 'Windy Webcams',
-        distance: this.calculateDistance(
-          lat,
-          lon,
-          cam.location.latitude,
-          cam.location.longitude
-        ),
-      }));
+      return data.webcams
+        .filter((cam: any) => cam?.images?.current?.preview && cam?.location)
+        .map((cam: any) => ({
+          url: cam.images.current.preview,
+          name: cam.title || 'Webcam',
+          source: 'Windy Webcams',
+          distance: this.calculateDistance(
+            lat,
+            lon,
+            cam.location.latitude,
+            cam.location.longitude
+          ),
+        }));
     } catch (error) {
       console.error('Error fetching Windy webcams:', error);
       return [];

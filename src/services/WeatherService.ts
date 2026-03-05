@@ -7,6 +7,7 @@ import {
   OpenWeatherMapForecastResponse,
   GeocodingResult,
 } from '@/types';
+import { useAppStore } from '@/stores/appStore';
 
 const API_KEY = import.meta.env.VITE_OPENWEATHERMAP_API_KEY || '';
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
@@ -21,15 +22,23 @@ if (API_KEY) {
 }
 
 export class WeatherService {
+  private static getApiLanguage(): 'en' | 'fr' {
+    const language = useAppStore.getState().settings.language;
+    return language === 'fr' ? 'fr' : 'en';
+  }
+
   static async getCurrentWeather(
     locationId: string,
     lat: number,
     lon: number
   ): Promise<WeatherData> {
+    const lang = this.getApiLanguage();
+
     // Check cache first
     const cached = await db.weatherData.get(locationId);
     if (
       cached &&
+      cached.language === lang &&
       cached.fetchedAt &&
       Date.now() - cached.fetchedAt.getTime() < CACHE_DURATION
     ) {
@@ -38,8 +47,8 @@ export class WeatherService {
 
     // Fetch fresh data
     const [currentResponse, forecastResponse] = await Promise.all([
-      fetch(`${BASE_URL}/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`),
-      fetch(`${BASE_URL}/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`),
+      fetch(`${BASE_URL}/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=${lang}`),
+      fetch(`${BASE_URL}/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=${lang}`),
     ]);
 
     if (!currentResponse.ok || !forecastResponse.ok) {
@@ -51,6 +60,7 @@ export class WeatherService {
 
     const weatherData: WeatherData = {
       locationId,
+      language: lang,
       current: this.parseCurrentWeather(currentData),
       forecast: this.parseForecast(forecastData),
       fetchedAt: new Date(),

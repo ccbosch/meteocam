@@ -3,6 +3,7 @@ import { Location } from '@/types';
 import { useWeather } from '@/hooks/useWeather';
 import { useAppStore } from '@/stores/appStore';
 import { WeatherService } from '@/services/WeatherService';
+import { useI18n } from '@/hooks/useI18n';
 
 interface LocationListProps {
   locations: Location[];
@@ -20,6 +21,7 @@ const LocationList: React.FC<LocationListProps> = ({ locations }) => {
 
 const LocationListItem: React.FC<{ location: Location }> = ({ location }) => {
   const { settings } = useAppStore();
+  const { t, language } = useI18n();
   const { weatherData, isLoading, error } = useWeather(
     location.id,
     location.latitude,
@@ -34,7 +36,10 @@ const LocationListItem: React.FC<{ location: Location }> = ({ location }) => {
           <div className="flex-1">
             <h3 className="font-semibold text-lg">{location.name}</h3>
             <p className="text-sm text-gray-500">
-              {location.webcamUrls.length} webcam{location.webcamUrls.length !== 1 ? 's' : ''}
+              {t('list.webcamCount', {
+                count: location.webcamUrls.length,
+                suffix: location.webcamUrls.length !== 1 && language === 'en' ? 's' : '',
+              })}
             </p>
           </div>
         </div>
@@ -48,7 +53,7 @@ const LocationListItem: React.FC<{ location: Location }> = ({ location }) => {
 
         {error && !isLoading && (
           <div className="text-xs text-yellow-600 dark:text-yellow-400">
-            ⚠️ Weather unavailable
+            ⚠️ {t('list.weatherUnavailable')}
           </div>
         )}
 

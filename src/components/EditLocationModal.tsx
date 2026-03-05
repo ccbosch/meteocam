@@ -4,6 +4,7 @@ import { LocationService } from '@/services/LocationService';
 import { WebcamSearchService } from '@/services/WebcamSearchService';
 import { useDialog } from '@/components/DialogProvider';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useI18n } from '@/hooks/useI18n';
 
 interface EditLocationModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ interface EditLocationModalProps {
 
 const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location, onClose, onSave }) => {
   const { showAlert } = useDialog();
+  const { t } = useI18n();
   const [locationName, setLocationName] = useState('');
   const [webcamUrls, setWebcamUrls] = useState<Array<{ url: string; name: string }>>([]);
   const [isSearchingWebcams, setIsSearchingWebcams] = useState(false);
@@ -76,8 +78,8 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
     const validWebcams = webcamUrls.filter(w => w.url.trim());
     if (validWebcams.length === 0) {
       await showAlert({
-        title: 'Webcam Required',
-        message: 'Please add at least one webcam URL.',
+        title: t('edit.webcamRequiredTitle'),
+        message: t('edit.webcamRequiredMessage'),
         type: 'warning'
       });
       return;
@@ -94,8 +96,8 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
       });
 
       await showAlert({
-        title: 'Success',
-        message: 'Location updated successfully!',
+        title: t('edit.successTitle'),
+        message: t('edit.successMessage'),
         type: 'success'
       });
 
@@ -103,7 +105,7 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
       onClose();
     } catch (error) {
       console.error('Error saving location:', error);
-      setError('Failed to save location. Please try again.');
+      setError(t('edit.errorSave'));
     } finally {
       setIsSaving(false);
     }
@@ -127,7 +129,7 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
         >
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Edit Location</h2>
+              <h2 className="text-2xl font-bold">{t('edit.title')}</h2>
               <button
                 onClick={onClose}
                 className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
@@ -146,7 +148,7 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
             <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-4">
               {/* Location Info */}
               <div>
-                <label className="block text-sm font-medium mb-2">Location Name</label>
+                <label className="block text-sm font-medium mb-2">{t('add.locationName')}</label>
                 <input
                   type="text"
                   value={locationName}
@@ -162,7 +164,7 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
                   <div className="flex items-center space-x-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
                     <p className="text-sm text-blue-800 dark:text-blue-200">
-                      🔍 Searching for nearby webcams...
+                      🔍 {t('edit.searchingWebcams')}
                     </p>
                   </div>
                 </div>
@@ -171,8 +173,8 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
               {!isSearchingWebcams && foundWebcams.length > 0 && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <label className="block text-sm font-medium">Found Webcams Nearby</label>
-                    <span className="text-xs text-gray-500">{foundWebcams.length} found</span>
+                    <label className="block text-sm font-medium">{t('edit.foundNearby')}</label>
+                    <span className="text-xs text-gray-500">{t('edit.foundCount', { count: foundWebcams.length })}</span>
                   </div>
                   <div className="max-h-48 overflow-y-auto space-y-2 border dark:border-gray-700 rounded-lg p-3">
                     {foundWebcams.map((webcam, index) => (
@@ -190,13 +192,13 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
                           className="ml-2 px-3 py-1 text-xs bg-primary-600 hover:bg-primary-700 text-white rounded transition-colors"
                           disabled={webcamUrls.some(w => w.url === webcam.url)}
                         >
-                          {webcamUrls.some(w => w.url === webcam.url) ? '✓ Added' : '+ Add'}
+                          {webcamUrls.some(w => w.url === webcam.url) ? `✓ ${t('add.added')}` : `+ ${t('add.add')}`}
                         </button>
                       </div>
                     ))}
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    💡 Click "+ Add" to add these webcams, or edit URLs below
+                    💡 {t('edit.quickAddHint')}
                   </p>
                 </div>
               )}
@@ -204,13 +206,13 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
               {/* Webcam URLs */}
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="block text-sm font-medium">Webcam URLs</label>
+                  <label className="block text-sm font-medium">{t('edit.webcamUrls')}</label>
                   <button
                     type="button"
                     onClick={addWebcamField}
                     className="text-sm text-primary-600 hover:text-primary-700"
                   >
-                    + Add Another
+                    + {t('edit.addAnother')}
                   </button>
                 </div>
                 <div className="space-y-3">
@@ -221,7 +223,7 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
                           type="url"
                           value={webcam.url}
                           onChange={(e) => updateWebcamUrl(index, 'url', e.target.value)}
-                          placeholder="https://example.com/webcam.jpg"
+                          placeholder={t('add.urlPlaceholder')}
                           className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
                           required={index === 0}
                         />
@@ -229,7 +231,7 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
                           type="text"
                           value={webcam.name}
                           onChange={(e) => updateWebcamUrl(index, 'name', e.target.value)}
-                          placeholder="Webcam name (optional)"
+                          placeholder={t('add.namePlaceholderOptional')}
                           className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
                         />
                       </div>
@@ -253,7 +255,7 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
                   ))}
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  Add direct image URLs from public webcams (JPEG, PNG, etc.)
+                  {t('add.urlHint')}
                 </p>
               </div>
 
@@ -270,14 +272,14 @@ const EditLocationModal: React.FC<EditLocationModalProps> = ({ isOpen, location,
                   onClick={onClose}
                   className="btn-secondary flex-1"
                 >
-                  Cancel
+                  {t('edit.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
                   className="btn-primary flex-1"
                 >
-                  {isSaving ? 'Saving...' : 'Save Changes'}
+                  {isSaving ? t('edit.saving') : t('edit.saveChanges')}
                 </button>
               </div>
             </form>

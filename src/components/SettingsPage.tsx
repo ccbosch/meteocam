@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStore } from '@/stores/appStore';
+import { useI18n } from '@/hooks/useI18n';
 
 const SettingsPage: React.FC = () => {
   const { settings, updateSettings } = useAppStore();
+  const { t } = useI18n();
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -20,20 +22,36 @@ const SettingsPage: React.FC = () => {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          <span>Back to Home</span>
+          <span>{t('settings.backHome')}</span>
         </Link>
       </div>
 
-      <h1 className="text-3xl font-bold mb-6">Settings</h1>
+      <h1 className="text-3xl font-bold mb-6">{t('settings.title')}</h1>
 
       <div className="space-y-6">
+        <div className="card p-6">
+          <h2 className="text-xl font-semibold mb-4">{t('settings.language')}</h2>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">{t('settings.languageLabel')}</label>
+            <select
+              value={settings.language}
+              onChange={(e) => updateSettings({ language: e.target.value as 'en' | 'fr' })}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
+            >
+              <option value="en">{t('settings.languageEnglish')}</option>
+              <option value="fr">{t('settings.languageFrench')}</option>
+            </select>
+          </div>
+        </div>
+
         {/* Units Section */}
         <div className="card p-6">
-          <h2 className="text-xl font-semibold mb-4">Units</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('settings.units')}</h2>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Temperature</label>
+              <label className="block text-sm font-medium mb-2">{t('settings.temperature')}</label>
               <div className="flex space-x-4">
                 <label className="flex items-center">
                   <input
@@ -61,7 +79,7 @@ const SettingsPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Wind Speed</label>
+              <label className="block text-sm font-medium mb-2">{t('settings.windSpeed')}</label>
               <div className="flex space-x-4">
                 <label className="flex items-center">
                   <input
@@ -92,11 +110,11 @@ const SettingsPage: React.FC = () => {
 
         {/* Refresh Settings */}
         <div className="card p-6">
-          <h2 className="text-xl font-semibold mb-4">Refresh Interval</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('settings.refresh')}</h2>
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              Default refresh interval for webcams and weather
+              {t('settings.refreshLabel')}
             </label>
             <select
               value={settings.defaultRefreshInterval}
@@ -105,20 +123,20 @@ const SettingsPage: React.FC = () => {
               }
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
             >
-              <option value={5 * 60 * 1000}>5 minutes</option>
-              <option value={15 * 60 * 1000}>15 minutes</option>
-              <option value={30 * 60 * 1000}>30 minutes</option>
-              <option value={60 * 60 * 1000}>1 hour</option>
+              <option value={5 * 60 * 1000}>{t('settings.minutes5')}</option>
+              <option value={15 * 60 * 1000}>{t('settings.minutes15')}</option>
+              <option value={30 * 60 * 1000}>{t('settings.minutes30')}</option>
+              <option value={60 * 60 * 1000}>{t('settings.hour1')}</option>
             </select>
           </div>
         </div>
 
         {/* Theme Settings */}
         <div className="card p-6">
-          <h2 className="text-xl font-semibold mb-4">Appearance</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('settings.appearance')}</h2>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Theme</label>
+            <label className="block text-sm font-medium mb-2">{t('settings.theme')}</label>
             <select
               value={settings.theme}
               onChange={(e) =>
@@ -126,20 +144,20 @@ const SettingsPage: React.FC = () => {
               }
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
             >
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-              <option value="auto">Auto (System)</option>
+              <option value="light">{t('settings.themeLight')}</option>
+              <option value="dark">{t('settings.themeDark')}</option>
+              <option value="auto">{t('settings.themeAuto')}</option>
             </select>
           </div>
         </div>
 
         {/* View Settings */}
         <div className="card p-6">
-          <h2 className="text-xl font-semibold mb-4">Default View</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('settings.defaultView')}</h2>
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              Default view when opening the app
+              {t('settings.defaultViewLabel')}
             </label>
             <select
               value={settings.defaultView}
@@ -148,20 +166,20 @@ const SettingsPage: React.FC = () => {
               }
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
             >
-              <option value="grid">Grid View</option>
-              <option value="list">List View</option>
-              <option value="map">Map View</option>
+              <option value="grid">{t('settings.gridView')}</option>
+              <option value="list">{t('settings.listView')}</option>
+              <option value="map">{t('settings.mapView')}</option>
             </select>
           </div>
         </div>
 
         {/* Notifications */}
         <div className="card p-6">
-          <h2 className="text-xl font-semibold mb-4">Notifications</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('settings.notifications')}</h2>
 
           <div className="space-y-4">
             <label className="flex items-center justify-between">
-              <span className="text-sm font-medium">Enable push notifications</span>
+              <span className="text-sm font-medium">{t('settings.pushNotifications')}</span>
               <input
                 type="checkbox"
                 checked={settings.notificationsEnabled}
@@ -173,7 +191,7 @@ const SettingsPage: React.FC = () => {
             </label>
 
             <label className="flex items-center justify-between">
-              <span className="text-sm font-medium">Weather alerts</span>
+              <span className="text-sm font-medium">{t('settings.weatherAlerts')}</span>
               <input
                 type="checkbox"
                 checked={settings.weatherAlertsEnabled}
@@ -188,18 +206,17 @@ const SettingsPage: React.FC = () => {
 
           {!settings.notificationsEnabled && (
             <p className="text-sm text-gray-500 mt-4">
-              Enable push notifications to receive weather alerts and updates
+              {t('settings.notificationsHint')}
             </p>
           )}
         </div>
 
         {/* About Section */}
         <div className="card p-6">
-          <h2 className="text-xl font-semibold mb-4">About</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('settings.about')}</h2>
           <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
             <p>
-              <strong>MeteoCam</strong> - View webcams and weather forecasts from your
-              favorite locations
+              <strong>MeteoCam</strong> - {t('settings.aboutText')}
             </p>
             <p>Version 1.0.0</p>
             <p className="pt-4">

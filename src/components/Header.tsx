@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStore } from '@/stores/appStore';
+import { useI18n } from '@/hooks/useI18n';
 
 const Header: React.FC = () => {
   const { currentView, setCurrentView } = useAppStore();
+  const { t } = useI18n();
 
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
@@ -26,7 +28,7 @@ const Header: React.FC = () => {
                     ? 'bg-white dark:bg-gray-600 shadow-sm'
                     : 'hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
-                title="Grid View"
+                title={t('header.viewGrid')}
               >
                 <svg
                   className="w-5 h-5"
@@ -49,7 +51,7 @@ const Header: React.FC = () => {
                     ? 'bg-white dark:bg-gray-600 shadow-sm'
                     : 'hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
-                title="List View"
+                title={t('header.viewList')}
               >
                 <svg
                   className="w-5 h-5"
@@ -72,7 +74,7 @@ const Header: React.FC = () => {
                     ? 'bg-white dark:bg-gray-600 shadow-sm'
                     : 'hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
-                title="Map View"
+                title={t('header.viewMap')}
               >
                 <svg
                   className="w-5 h-5"
@@ -94,7 +96,7 @@ const Header: React.FC = () => {
             <Link
               to="/settings"
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              title="Settings"
+              title={t('header.settings')}
             >
               <svg
                 className="w-6 h-6"

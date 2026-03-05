@@ -35,6 +35,7 @@ export const initializeDefaultSettings = async () => {
   if (!existingSettings) {
     await db.settings.add({
       id: 'default',
+      language: 'fr',
       temperatureUnit: 'celsius',
       windSpeedUnit: 'kmh',
       defaultRefreshInterval: 15 * 60 * 1000, // 15 minutes

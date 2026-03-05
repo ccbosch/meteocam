@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Location } from '@/types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useI18n } from '@/hooks/useI18n';
 
 interface MapViewProps {
   locations: Location[];
@@ -18,6 +19,7 @@ L.Icon.Default.mergeOptions({
 const MapView: React.FC<MapViewProps> = ({ locations }) => {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const { t } = useI18n();
 
   useEffect(() => {
     if (!mapContainerRef.current || locations.length === 0) return;
@@ -49,7 +51,7 @@ const MapView: React.FC<MapViewProps> = ({ locations }) => {
       marker.bindPopup(`
         <div class="p-2">
           <h3 class="font-semibold text-lg">${location.name}</h3>
-          <p class="text-sm text-gray-600">${location.webcamUrls.length} webcam(s)</p>
+          <p class="text-sm text-gray-600">${t('map.webcamsCount', { count: location.webcamUrls.length })}</p>
         </div>
       `);
 
@@ -67,12 +69,12 @@ const MapView: React.FC<MapViewProps> = ({ locations }) => {
         mapRef.current = null;
       }
     };
-  }, [locations]);
+  }, [locations, t]);
 
   if (locations.length === 0) {
     return (
       <div className="card p-8 text-center">
-        <p className="text-gray-500">Add locations to see them on the map</p>
+        <p className="text-gray-500">{t('map.empty')}</p>
       </div>
     );
   }

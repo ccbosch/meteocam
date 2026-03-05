@@ -4,6 +4,7 @@ import { WeatherService } from '@/services/WeatherService';
 import { WebcamSearchService } from '@/services/WebcamSearchService';
 import { GeocodingResult } from '@/types';
 import { useDialog } from '@/components/DialogProvider';
+import { useI18n } from '@/hooks/useI18n';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -15,6 +16,7 @@ interface AddLocationModalProps {
 const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) => {
   const { addLocation } = useLocations();
   const { showAlert } = useDialog();
+  const { t } = useI18n();
   const [mode, setMode] = useState<'search' | 'manual' | 'map'>('search');
   const [step, setStep] = useState<'search' | 'details'>('search');
   const [searchQuery, setSearchQuery] = useState('');
@@ -47,7 +49,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
     try {
       const results = await WeatherService.searchLocations(searchQuery);
       if (results.length === 0) {
-        setSearchError('No locations found. Try searching for a city name (e.g., "Paris", "Tokyo", "New York")');
+        setSearchError(t('add.errorNoLocations'));
       }
       setSearchResults(results);
     } catch (error: any) {
@@ -85,7 +87,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
     const lat = parseFloat(manualLat);
     const lon = parseFloat(manualLon);
     if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
-      setSearchError('Invalid coordinates. Latitude must be between -90 and 90, longitude between -180 and 180.');
+      setSearchError(t('add.errorInvalidCoords'));
       return;
     }
     setSelectedLocation({ name: locationName, lat, lon, country: '', state: '' });
@@ -96,7 +98,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
 
   const handleMapEntry = () => {
     if (!locationName.trim() || mapLat === null || mapLon === null) {
-      setSearchError('Please click on the map to select a location.');
+      setSearchError(t('add.errorSelectMapLocation'));
       return;
     }
     setSelectedLocation({ name: locationName, lat: mapLat, lon: mapLon, country: '', state: '' });
@@ -215,8 +217,8 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
     const validWebcams = webcamUrls.filter((w) => w.url.trim());
     if (validWebcams.length === 0) {
       await showAlert({
-        title: 'Webcam Required',
-        message: 'Please add at least one webcam URL to continue.',
+        title: t('add.webcamRequiredTitle'),
+        message: t('add.webcamRequiredMessage'),
         type: 'warning'
       });
       return;
@@ -229,8 +231,8 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
     } catch (error) {
       console.error('Error adding location:', error);
       await showAlert({
-        title: 'Error',
-        message: 'Failed to add location. Please try again.',
+        title: t('add.errorTitle'),
+        message: t('add.errorAddLocation'),
         type: 'error'
       });
     } finally {
@@ -271,7 +273,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
       <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Add Location</h2>
+            <h2 className="text-2xl font-bold">{t('add.title')}</h2>
             <button
               onClick={handleClose}
               className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
@@ -300,7 +302,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                       : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                 >
-                  🔍 Search City
+                  🔍 {t('add.searchCity')}
                 </button>
                 <button
                   type="button"
@@ -311,7 +313,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                       : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                 >
-                  🗺️ Map Picker
+                  🗺️ {t('add.mapPicker')}
                 </button>
                 <button
                   type="button"
@@ -322,20 +324,20 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                       : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                 >
-                  📍 Manual Entry
+                  📍 {t('add.manualEntry')}
                 </button>
               </div>
 
               {mode === 'search' && (
                 <div>
               <form onSubmit={handleSearch} className="mb-4">
-                <label className="block text-sm font-medium mb-2">Search for a City</label>
+                <label className="block text-sm font-medium mb-2">{t('add.searchLabel')}</label>
                 <div className="flex space-x-2">
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="e.g., Paris, Tokyo, New York, London..."
+                    placeholder={t('add.searchPlaceholder')}
                     className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
                     autoFocus
                   />
@@ -344,11 +346,11 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                     disabled={isSearching || !searchQuery.trim()}
                     className="btn-primary"
                   >
-                    {isSearching ? 'Searching...' : 'Search'}
+                    {isSearching ? t('add.searching') : t('add.search')}
                   </button>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  💡 <strong>Tip:</strong> Search for city names (e.g., "Lyon" or "Marseille" for France), not country names.
+                  💡 {t('add.searchTip')}
                 </p>
               </form>
 
@@ -363,8 +365,8 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                   <svg className="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
-                  <p className="font-medium mb-1">Start searching for a location</p>
-                  <p className="text-sm">Try popular cities:</p>
+                  <p className="font-medium mb-1">{t('add.startSearching')}</p>
+                  <p className="text-sm">{t('add.tryPopular')}</p>
                   <div className="flex flex-wrap justify-center gap-2 mt-3">
                     {['Paris', 'Tokyo', 'New York', 'London', 'Sydney'].map(city => (
                       <button
@@ -385,7 +387,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
 
               {searchResults.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Select a location:</p>
+                  <p className="text-sm font-medium">{t('add.selectLocation')}</p>
                   {searchResults.map((result, index) => (
                     <button
                       key={index}
@@ -411,17 +413,17 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
               <div className="space-y-4">
                 <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                   <p className="text-sm text-blue-800 dark:text-blue-200">
-                    ℹ️ <strong>Manual Entry Mode:</strong> Use this when the weather API is unavailable. You can still add locations and view webcams.
+                    ℹ️ {t('add.manualInfo')}
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Location Name</label>
+                  <label className="block text-sm font-medium mb-2">{t('add.locationName')}</label>
                   <input
                     type="text"
                     value={locationName}
                     onChange={(e) => setLocationName(e.target.value)}
-                    placeholder="e.g., Paris, France"
+                    placeholder={t('add.searchPlaceholder')}
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
                     required
                   />
@@ -429,7 +431,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Latitude</label>
+                    <label className="block text-sm font-medium mb-2">{t('add.latitude')}</label>
                     <input
                       type="number"
                       step="any"
@@ -441,7 +443,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Longitude</label>
+                    <label className="block text-sm font-medium mb-2">{t('add.longitude')}</label>
                     <input
                       type="number"
                       step="any"
@@ -462,11 +464,11 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
 
                 <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                   <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                    <strong>How to find coordinates:</strong>
+                    <strong>{t('add.howToFindCoords')}</strong>
                   </p>
                   <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1 list-disc list-inside">
-                    <li>Google Maps: Right-click location → first two numbers</li>
-                    <li>Search "[city name] coordinates" on Google</li>
+                    <li>{t('add.coordsTipGoogleMaps')}</li>
+                    <li>{t('add.coordsTipSearch')}</li>
                     <li>Use <a href="https://www.latlong.net/" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">LatLong.net</a></li>
                   </ul>
                 </div>
@@ -477,7 +479,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                   disabled={!locationName.trim() || !manualLat.trim() || !manualLon.trim()}
                   className="btn-primary w-full"
                 >
-                  Continue to Webcams
+                  {t('add.continueToWebcams')}
                 </button>
               </div>
             )}
@@ -486,17 +488,17 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
               <div className="space-y-4">
                 <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                   <p className="text-sm text-blue-800 dark:text-blue-200">
-                    🗺️ <strong>Map Picker Mode:</strong> Click anywhere on the map to select a location. You can zoom and pan to find the exact spot.
+                    🗺️ {t('add.mapInfo')}
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Location Name</label>
+                  <label className="block text-sm font-medium mb-2">{t('add.locationName')}</label>
                   <input
                     type="text"
                     value={locationName}
                     onChange={(e) => setLocationName(e.target.value)}
-                    placeholder="e.g., Paris, France"
+                    placeholder={t('add.searchPlaceholder')}
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
                     required
                   />
@@ -513,7 +515,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                 {mapLat !== null && mapLon !== null && (
                   <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                     <p className="text-sm text-green-800 dark:text-green-200">
-                      ✓ <strong>Selected:</strong> Lat: {mapLat.toFixed(6)}, Lon: {mapLon.toFixed(6)}
+                      ✓ {t('add.selectedCoords', { lat: mapLat.toFixed(6), lon: mapLon.toFixed(6) })}
                     </p>
                   </div>
                 )}
@@ -530,7 +532,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                   disabled={!locationName.trim() || mapLat === null || mapLon === null}
                   className="btn-primary w-full"
                 >
-                  Continue to Webcams
+                  {t('add.continueToWebcams')}
                 </button>
               </div>
             )}
@@ -547,11 +549,11 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                Back to search
+                {t('add.backToSearch')}
               </button>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Location Name</label>
+                <label className="block text-sm font-medium mb-2">{t('add.locationName')}</label>
                 <input
                   type="text"
                   value={locationName}
@@ -567,7 +569,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                   <div className="flex items-center space-x-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
                     <p className="text-sm text-blue-800 dark:text-blue-200">
-                      🔍 Searching for nearby webcams...
+                      🔍 {t('add.searchingWebcams')}
                     </p>
                   </div>
                 </div>
@@ -576,8 +578,8 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
               {!isSearchingWebcams && foundWebcams.length > 0 && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <label className="block text-sm font-medium">Found Webcams Nearby</label>
-                    <span className="text-xs text-gray-500">{foundWebcams.length} found</span>
+                    <label className="block text-sm font-medium">{t('add.foundNearby')}</label>
+                    <span className="text-xs text-gray-500">{t('add.foundCount', { count: foundWebcams.length })}</span>
                   </div>
                   <div className="max-h-48 overflow-y-auto space-y-2 border dark:border-gray-700 rounded-lg p-3">
                     {foundWebcams.map((webcam, index) => (
@@ -595,13 +597,13 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                           className="ml-2 px-3 py-1 text-xs bg-primary-600 hover:bg-primary-700 text-white rounded transition-colors"
                           disabled={webcamUrls.some(w => w.url === webcam.url)}
                         >
-                          {webcamUrls.some(w => w.url === webcam.url) ? '✓ Added' : '+ Add'}
+                          {webcamUrls.some(w => w.url === webcam.url) ? `✓ ${t('add.added')}` : `+ ${t('add.add')}`}
                         </button>
                       </div>
                     ))}
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    💡 Click "+ Add" to quickly add webcams, or manually enter URLs below
+                    💡 {t('add.quickAddHint')}
                   </p>
                 </div>
               )}
@@ -609,10 +611,10 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
               {!isSearchingWebcams && foundWebcams.length === 0 && webcamSuggestions.length > 0 && (
                 <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg space-y-2">
                   <p className="text-sm text-yellow-800 dark:text-yellow-200 font-medium">
-                    📷 No webcams found automatically
+                    📷 {t('add.noneFound')}
                   </p>
                   <p className="text-xs text-yellow-700 dark:text-yellow-300">
-                    Try searching Google with these terms:
+                    {t('add.tryGoogleTerms')}
                   </p>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {webcamSuggestions.slice(0, 3).map((suggestion, index) => (
@@ -632,13 +634,13 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
 
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="block text-sm font-medium">Webcam URLs</label>
+                  <label className="block text-sm font-medium">{t('add.webcamUrls')}</label>
                   <button
                     type="button"
                     onClick={addWebcamField}
                     className="text-sm text-primary-600 hover:text-primary-700"
                   >
-                    + Add Another
+                    + {t('add.addAnother')}
                   </button>
                 </div>
                 <div className="space-y-3">
@@ -649,7 +651,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                           type="url"
                           value={webcam.url}
                           onChange={(e) => updateWebcamUrl(index, 'url', e.target.value)}
-                          placeholder="https://example.com/webcam.jpg"
+                          placeholder={t('add.urlPlaceholder')}
                           className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
                           required={index === 0}
                         />
@@ -657,7 +659,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                           type="text"
                           value={webcam.name}
                           onChange={(e) => updateWebcamUrl(index, 'name', e.target.value)}
-                          placeholder="Webcam name (optional)"
+                          placeholder={t('add.namePlaceholderOptional')}
                           className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
                         />
                       </div>
@@ -681,7 +683,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                   ))}
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  Add direct image URLs from public webcams (JPEG, PNG, etc.)
+                  {t('add.urlHint')}
                 </p>
               </div>
 
@@ -691,14 +693,14 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                   onClick={handleClose}
                   className="btn-secondary flex-1"
                 >
-                  Cancel
+                  {t('add.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="btn-primary flex-1"
                 >
-                  {isSubmitting ? 'Adding...' : 'Add Location'}
+                  {isSubmitting ? t('add.adding') : t('add.addLocation')}
                 </button>
               </div>
             </form>

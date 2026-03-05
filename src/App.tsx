@@ -10,7 +10,7 @@ import SettingsPage from '@/components/SettingsPage';
 import OfflineIndicator from '@/components/OfflineIndicator';
 
 function App() {
-  const { setIsOnline } = useAppStore();
+  const { setIsOnline, settings } = useAppStore();
 
   useEffect(() => {
     // Initialize database
@@ -28,6 +28,10 @@ function App() {
       window.removeEventListener('offline', handleOffline);
     };
   }, [setIsOnline]);
+
+  useEffect(() => {
+    document.documentElement.lang = settings.language || 'fr';
+  }, [settings.language]);
 
   const handleUpdate = () => {
     const updateSW = (window as any).__updateSW;

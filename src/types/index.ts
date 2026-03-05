@@ -20,6 +20,7 @@ export interface WebcamSource {
 // Weather types
 export interface WeatherData {
   locationId: string;
+  language?: 'en' | 'fr';
   current: CurrentWeather;
   forecast: ForecastDay[];
   fetchedAt: Date;
@@ -55,6 +56,7 @@ export interface ForecastDay {
 
 // Settings types
 export interface AppSettings {
+  language: 'en' | 'fr';
   temperatureUnit: 'celsius' | 'fahrenheit';
   windSpeedUnit: 'kmh' | 'mph';
   defaultRefreshInterval: number; // in milliseconds

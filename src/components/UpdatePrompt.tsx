@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Dialog from './Dialog';
+import { useI18n } from '@/hooks/useI18n';
 
 interface UpdatePromptProps {
   onUpdate: () => void;
@@ -15,6 +16,7 @@ export const triggerUpdatePrompt = () => {
 
 const UpdatePrompt: React.FC<UpdatePromptProps> = ({ onUpdate }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useI18n();
 
   useEffect(() => {
     showUpdatePromptHandler = () => setIsOpen(true);
@@ -37,14 +39,14 @@ const UpdatePrompt: React.FC<UpdatePromptProps> = ({ onUpdate }) => {
     <Dialog
       isOpen={isOpen}
       onClose={handleClose}
-      title="Update Available"
+      title={t('update.title')}
       type="info"
       onConfirm={handleUpdate}
-      confirmText="Update Now"
-      cancelText="Later"
+      confirmText={t('update.confirm')}
+      cancelText={t('update.later')}
     >
-      <p>A new version of MeteoCam is available. Would you like to update now?</p>
-      <p className="text-sm text-gray-500 mt-2">The app will reload after updating.</p>
+      <p>{t('update.message')}</p>
+      <p className="text-sm text-gray-500 mt-2">{t('update.reloadHint')}</p>
     </Dialog>
   );
 };

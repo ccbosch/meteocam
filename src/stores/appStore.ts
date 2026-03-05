@@ -17,6 +17,7 @@ export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
       settings: {
+        language: 'fr',
         temperatureUnit: 'celsius',
         windSpeedUnit: 'kmh',
         defaultRefreshInterval: 15 * 60 * 1000,
@@ -38,6 +39,17 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'meteocam-storage',
+      merge: (persistedState, currentState) => {
+        const typedPersisted = persistedState as Partial<AppState>;
+        return {
+          ...currentState,
+          ...typedPersisted,
+          settings: {
+            ...currentState.settings,
+            ...typedPersisted.settings,
+          },
+        };
+      },
       partialize: (state) => ({
         settings: state.settings,
         currentView: state.currentView,

@@ -8,10 +8,12 @@ import MapView from './MapView';
 import AddLocationModal from './AddLocationModal';
 import EditLocationModal from './EditLocationModal';
 import EmptyState from './EmptyState';
+import { useI18n } from '@/hooks/useI18n';
 
 const HomePage: React.FC = () => {
   const { locations, isLoading } = useLocations();
   const { currentView } = useAppStore();
+  const { t } = useI18n();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingLocation, setEditingLocation] = useState<Location | null>(null);
@@ -49,7 +51,7 @@ const HomePage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">My Locations</h2>
+        <h2 className="text-2xl font-bold">{t('home.myLocations')}</h2>
         <button
           onClick={() => setIsAddModalOpen(true)}
           className="btn-primary flex items-center space-x-2"
@@ -62,7 +64,7 @@ const HomePage: React.FC = () => {
               d="M12 4v16m8-8H4"
             />
           </svg>
-          <span>Add Location</span>
+          <span>{t('home.addLocation')}</span>
         </button>
       </div>
 

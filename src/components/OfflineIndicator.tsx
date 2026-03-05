@@ -1,8 +1,10 @@
 import React from 'react';
 import { useAppStore } from '@/stores/appStore';
+import { useI18n } from '@/hooks/useI18n';
 
 const OfflineIndicator: React.FC = () => {
   const { isOnline } = useAppStore();
+  const { t } = useI18n();
 
   if (isOnline) return null;
 
@@ -16,7 +18,7 @@ const OfflineIndicator: React.FC = () => {
             clipRule="evenodd"
           />
         </svg>
-        <span className="font-medium">You are offline</span>
+        <span className="font-medium">{t('offline.message')}</span>
       </div>
     </div>
   );
