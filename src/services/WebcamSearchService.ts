@@ -63,12 +63,18 @@ export class WebcamSearchService {
     }
 
     const radius = 50; // 50km radius
-    const url = `https://api.windy.com/api/webcams/v2/list/nearby=${lat},${lon},${radius}?show=webcams:image,location&key=${apiKey}`;
+    // In development, use the Vite proxy to bypass CORS
+    // In production, use the direct API (make sure CORS is configured on backend or use a backend proxy)
+    const isDev = import.meta.env.DEV;
+    const baseUrl = isDev 
+      ? `/api/windy/v2/list/nearby=${lat},${lon},${radius}?show=webcams:image,location&key=${apiKey}`
+      : `https://api.windy.com/api/webcams/v2/list/nearby=${lat},${lon},${radius}?show=webcams:image,location&key=${apiKey}`;
 
     try {
-      const response = await fetch(url);
+      const response = await fetch(baseUrl);
       if (!response.ok) {
-        throw new Error('Windy API request failed');
+        console.warn(`Windy API returned status ${response.status}`);
+        return [];
       }
 
       const data = await response.json();
