@@ -36,8 +36,17 @@ export const useWebcam = (url: string, refreshInterval: number = 15 * 60 * 1000)
     // Set up auto-refresh
     const interval = setInterval(fetchImage, refreshInterval);
 
+    // Refresh when app comes back into focus
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchImage();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       // Cleanup blob URL on unmount
       if (imageUrl) {
         URL.revokeObjectURL(imageUrl);
