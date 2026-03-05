@@ -6,9 +6,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api/windy': {
-        target: 'https://api.windy.com',
+        target: 'https://api.windy.com/api/webcams',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/windy/, '/api/webcams')
+        rewrite: (path) => path.replace(/^\/api\/windy/, '')
       }
     }
   },
