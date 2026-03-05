@@ -41,6 +41,7 @@ export const initializeDefaultSettings = async () => {
       defaultRefreshInterval: 15 * 60 * 1000, // 15 minutes
       theme: 'auto',
       defaultView: 'grid',
+      locationSortBy: 'custom',
       notificationsEnabled: false,
       weatherAlertsEnabled: false,
     });

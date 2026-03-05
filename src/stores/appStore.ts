@@ -23,6 +23,7 @@ export const useAppStore = create<AppState>()(
         defaultRefreshInterval: 15 * 60 * 1000,
         theme: 'auto',
         defaultView: 'grid',
+        locationSortBy: 'custom',
         notificationsEnabled: false,
         weatherAlertsEnabled: false,
       },

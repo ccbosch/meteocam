@@ -62,6 +62,7 @@ export interface AppSettings {
   defaultRefreshInterval: number; // in milliseconds
   theme: 'light' | 'dark' | 'auto';
   defaultView: 'grid' | 'list' | 'map';
+  locationSortBy: LocationSortBy;
   notificationsEnabled: boolean;
   weatherAlertsEnabled: boolean;
 }
@@ -103,6 +104,7 @@ export interface TimelapseConfig {
 
 // View types
 export type ViewMode = 'grid' | 'list' | 'map';
+export type LocationSortBy = 'name-asc' | 'name-desc' | 'date-asc' | 'date-desc' | 'custom';
 
 // API response types
 export interface OpenWeatherMapCurrentResponse {

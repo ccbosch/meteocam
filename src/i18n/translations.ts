@@ -10,6 +10,9 @@ export type TranslationKey =
   | 'card.exitFullscreen'
   | 'home.myLocations'
   | 'home.addLocation'
+  | 'home.refresh'
+  | 'home.refreshing'
+  | 'home.dragToReorder'
   | 'empty.noLocations'
   | 'empty.startMessage'
   | 'empty.addFirst'
@@ -49,6 +52,12 @@ export type TranslationKey =
   | 'map.webcamsCount'
   | 'list.webcamCount'
   | 'list.weatherUnavailable'
+  | 'list.sortBy'
+  | 'list.sortNameAsc'
+  | 'list.sortNameDesc'
+  | 'list.sortDateAsc'
+  | 'list.sortDateDesc'
+  | 'list.sortCustom'
   | 'location.webcamUnavailable'
   | 'location.weatherUnavailable'
   | 'add.title'
@@ -137,6 +146,9 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     'card.exitFullscreen': 'Exit fullscreen',
     'home.myLocations': 'My Locations',
     'home.addLocation': 'Add Location',
+    'home.refresh': 'Refresh All',
+    'home.refreshing': 'Refreshing...',
+    'home.dragToReorder': 'Drag cards to reorder (custom sort only)',
     'empty.noLocations': 'No locations added yet',
     'empty.startMessage': 'Start by adding your favorite locations to view webcams and weather forecasts.',
     'empty.addFirst': 'Add Your First Location',
@@ -176,6 +188,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     'map.webcamsCount': '{count} webcam(s)',
     'list.webcamCount': '{count} webcam{suffix}',
     'list.weatherUnavailable': 'Weather unavailable',
+    'list.sortBy': 'Sort by',
+    'list.sortNameAsc': 'Name (A-Z)',
+    'list.sortNameDesc': 'Name (Z-A)',
+    'list.sortDateAsc': 'Oldest first',
+    'list.sortDateDesc': 'Newest first',
+    'list.sortCustom': 'Custom order',
     'location.webcamUnavailable': 'Webcam unavailable',
     'location.weatherUnavailable': 'Weather data unavailable',
     'add.title': 'Add Location',
@@ -263,6 +281,9 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     'card.exitFullscreen': 'Quitter le plein ecran',
     'home.myLocations': 'Mes lieux',
     'home.addLocation': 'Ajouter un lieu',
+    'home.refresh': 'Tout actualiser',
+    'home.refreshing': 'Actualisation...',
+    'home.dragToReorder': 'Glissez les cartes pour reordonner (tri personnalise uniquement)',
     'empty.noLocations': 'Aucun lieu ajoute pour le moment',
     'empty.startMessage': 'Ajoutez vos lieux favoris pour voir les webcams et les previsions meteo.',
     'empty.addFirst': 'Ajouter votre premier lieu',
@@ -302,6 +323,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     'map.webcamsCount': '{count} webcam(s)',
     'list.webcamCount': '{count} webcam{suffix}',
     'list.weatherUnavailable': 'Meteo indisponible',
+    'list.sortBy': 'Trier par',
+    'list.sortNameAsc': 'Nom (A-Z)',
+    'list.sortNameDesc': 'Nom (Z-A)',
+    'list.sortDateAsc': 'Plus anciens',
+    'list.sortDateDesc': 'Plus recents',
+    'list.sortCustom': 'Ordre personnalise',
     'location.webcamUnavailable': 'Webcam indisponible',
     'location.weatherUnavailable': 'Donnees meteo indisponibles',
     'add.title': 'Ajouter un lieu',

@@ -10,9 +10,26 @@ import { useI18n } from '@/hooks/useI18n';
 interface LocationCardProps {
   location: Location;
   onEdit?: (location: Location) => void;
+  isDraggable?: boolean;
+  isDragging?: boolean;
+  isDragOver?: boolean;
+  onDragStart?: () => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDragEnd?: () => void;
+  onDragLeave?: () => void;
 }
 
-const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit }) => {
+const LocationCard: React.FC<LocationCardProps> = ({ 
+  location, 
+  onEdit,
+  isDraggable = false,
+  isDragging = false,
+  isDragOver = false,
+  onDragStart,
+  onDragOver,
+  onDragEnd,
+  onDragLeave,
+}) => {
   const { settings } = useAppStore();
   const { t } = useI18n();
   const { weatherData, isLoading: weatherLoading, error: weatherError } = useWeather(
@@ -251,8 +268,37 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit }) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="card overflow-hidden cursor-pointer"
+        className={`card overflow-hidden cursor-pointer transition-all ${
+          isDragging ? 'opacity-40 scale-95' : ''
+        } ${
+          isDragOver ? 'ring-4 ring-primary-500 scale-105' : ''
+        } ${
+          isDraggable ? 'cursor-grab active:cursor-grabbing' : ''
+        }`}
         onClick={handleCardClick}
+        draggable={isDraggable}
+        onDragStart={(e) => {
+          if (isDraggable && onDragStart) {
+            e.stopPropagation();
+            onDragStart();
+          }
+        }}
+        onDragOver={(e) => {
+          if (isDraggable && onDragOver) {
+            onDragOver(e);
+          }
+        }}
+        onDragEnd={(e) => {
+          if (isDraggable && onDragEnd) {
+            e.stopPropagation();
+            onDragEnd();
+          }
+        }}
+        onDragLeave={() => {
+          if (isDraggable && onDragLeave) {
+            onDragLeave();
+          }
+        }}
       >
         {renderCardContent(false)}
       </motion.div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Location } from '@/types';
+import { Location, LocationSortBy } from '@/types';
 import { useWeather } from '@/hooks/useWeather';
 import { useAppStore } from '@/stores/appStore';
 import { WeatherService } from '@/services/WeatherService';
@@ -10,8 +10,32 @@ interface LocationListProps {
 }
 
 const LocationList: React.FC<LocationListProps> = ({ locations }) => {
+  const { settings, updateSettings } = useAppStore();
+  const { t } = useI18n();
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateSettings({ locationSortBy: e.target.value as LocationSortBy });
+  };
+
   return (
     <div className="space-y-4">
+      <div className="flex justify-between items-center mb-4">
+        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          {t('list.sortBy')}:
+        </label>
+        <select
+          value={settings.locationSortBy}
+          onChange={handleSortChange}
+          className="input w-auto"
+        >
+          <option value="custom">{t('list.sortCustom')}</option>
+          <option value="name-asc">{t('list.sortNameAsc')}</option>
+          <option value="name-desc">{t('list.sortNameDesc')}</option>
+          <option value="date-desc">{t('list.sortDateDesc')}</option>
+          <option value="date-asc">{t('list.sortDateAsc')}</option>
+        </select>
+      </div>
+      
       {locations.map((location) => (
         <LocationListItem key={location.id} location={location} />
       ))}
