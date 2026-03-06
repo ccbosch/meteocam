@@ -33,9 +33,11 @@ export const db = new MeteoCamDatabase();
 export const initializeDefaultSettings = async () => {
   const existingSettings = await db.settings.get('default');
   if (!existingSettings) {
+    const lang = navigator.language || navigator.languages?.[0] || 'en';
+    const detectedLanguage: 'en' | 'fr' = lang.toLowerCase().startsWith('fr') ? 'fr' : 'en';
     await db.settings.add({
       id: 'default',
-      language: 'fr',
+      language: detectedLanguage,
       temperatureUnit: 'celsius',
       windSpeedUnit: 'kmh',
       defaultRefreshInterval: 15 * 60 * 1000, // 15 minutes

@@ -2,6 +2,11 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { AppSettings, ViewMode } from '@/types';
 
+const detectLanguage = (): 'en' | 'fr' => {
+  const lang = navigator.language || navigator.languages?.[0] || 'en';
+  return lang.toLowerCase().startsWith('fr') ? 'fr' : 'en';
+};
+
 interface AppState {
   settings: AppSettings;
   currentView: ViewMode;
@@ -19,7 +24,7 @@ export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
       settings: {
-        language: 'fr',
+        language: detectLanguage(),
         temperatureUnit: 'celsius',
         windSpeedUnit: 'kmh',
         defaultRefreshInterval: 15 * 60 * 1000,

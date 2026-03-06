@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocations } from '@/hooks/useLocations';
 import { WeatherService } from '@/services/WeatherService';
 import { WebcamSearchService } from '@/services/WebcamSearchService';
@@ -323,8 +324,8 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  return createPortal(
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1001] p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
@@ -771,7 +772,8 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
