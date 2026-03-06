@@ -311,26 +311,50 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit, onLocatio
         )}
 
         {weatherData && !weatherLoading && (
-          <div className="flex items-center space-x-3">
-            <img
-              src={WeatherService.getWeatherIconUrl(weatherData.current.weatherIcon)}
-              alt={weatherData.current.weatherDescription}
-              className="w-16 h-16"
-            />
-            <div>
-              <div className="text-3xl font-bold">
-                {Math.round(
-                  WeatherService.convertTemp(
-                    weatherData.current.temp,
-                    settings.temperatureUnit
-                  )
-                )}
-                °{settings.temperatureUnit === 'celsius' ? 'C' : 'F'}
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400 capitalize">
-                {weatherData.current.weatherDescription}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center space-x-3">
+              <img
+                src={WeatherService.getWeatherIconUrl(weatherData.current.weatherIcon)}
+                alt={weatherData.current.weatherDescription}
+                className="w-16 h-16"
+              />
+              <div>
+                <div className="text-3xl font-bold">
+                  {Math.round(
+                    WeatherService.convertTemp(
+                      weatherData.current.temp,
+                      settings.temperatureUnit
+                    )
+                  )}
+                  °{settings.temperatureUnit === 'celsius' ? 'C' : 'F'}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 capitalize">
+                  {weatherData.current.weatherDescription}
+                </div>
               </div>
             </div>
+            {/* Mini 3-day forecast */}
+            {weatherData.forecast.length > 0 && (
+              <div className="flex items-center gap-2">
+                {weatherData.forecast.slice(0, 4).map((day, i) => (
+                  <div key={i} className="flex flex-col items-center">
+                    <div className="flex items-center gap-0.5">
+                      <img
+                        src={WeatherService.getWeatherIconUrl(day.weatherIcon)}
+                        alt={day.weatherDescription}
+                        className="w-6 h-6"
+                      />
+                      <span className="text-xs font-semibold">
+                        {Math.round(WeatherService.convertTemp(day.tempMax, settings.temperatureUnit))}°
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {new Date(day.date).toLocaleDateString(settings.language === 'fr' ? 'fr-FR' : 'en-US', { weekday: 'short' })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -338,11 +362,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit, onLocatio
         {weatherData && (
           <div className="grid grid-cols-2 gap-2 mt-4 text-sm">
             <div className="flex items-center space-x-2">
-              <span className="text-gray-500">💧</span>
-              <span>{weatherData.current.humidity}%</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-gray-500">💨</span>
+              <span className="text-gray-500">�</span>
               <span>
                 {Math.round(
                   WeatherService.convertWindSpeed(
@@ -352,6 +372,10 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit, onLocatio
                 )}{' '}
                 {settings.windSpeedUnit}
               </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-500">💧</span>
+              <span>{weatherData.current.humidity}%</span>
             </div>
           </div>
         )}
