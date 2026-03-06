@@ -12,7 +12,7 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="text-2xl">📷</div>
+            <img src="/favicon.svg" alt="MeteoCam" className="w-9 h-9" />
             <h1 className="text-2xl font-bold text-primary-600 dark:text-primary-400">
               MeteoCam
             </h1>

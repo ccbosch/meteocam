@@ -33,6 +33,24 @@ function App() {
     document.documentElement.lang = settings.language || 'fr';
   }, [settings.language]);
 
+  useEffect(() => {
+    const root = document.documentElement;
+    if (settings.theme === 'dark') {
+      root.classList.add('dark');
+    } else if (settings.theme === 'light') {
+      root.classList.remove('dark');
+    } else {
+      // auto: follow system preference
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      const apply = (e: MediaQueryListEvent | MediaQueryList) => {
+        root.classList.toggle('dark', e.matches);
+      };
+      apply(mq);
+      mq.addEventListener('change', apply);
+      return () => mq.removeEventListener('change', apply);
+    }
+  }, [settings.theme]);
+
   const handleUpdate = () => {
     const updateSW = (window as any).__updateSW;
     if (updateSW) {
