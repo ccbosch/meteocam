@@ -19,7 +19,8 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit, onLocatio
   const { weatherData, isLoading: weatherLoading, error: weatherError } = useWeather(
     location.id,
     location.latitude,
-    location.longitude
+    location.longitude,
+    location.name
   );
   
   const [currentWebcamIndex, setCurrentWebcamIndex] = useState(0);

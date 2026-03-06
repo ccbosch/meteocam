@@ -45,6 +45,9 @@ export type TranslationKey =
   | 'settings.pushNotifications'
   | 'settings.weatherAlerts'
   | 'settings.notificationsHint'
+  | 'settings.notificationsGranted'
+  | 'settings.notificationsDenied'
+  | 'settings.notificationsUnsupported'
   | 'settings.about'
   | 'settings.aboutText'
   | 'offline.message'
@@ -189,6 +192,9 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     'settings.pushNotifications': 'Enable push notifications',
     'settings.weatherAlerts': 'Weather alerts',
     'settings.notificationsHint': 'Enable push notifications to receive weather alerts and updates',
+    'settings.notificationsGranted': 'Notifications are active',
+    'settings.notificationsDenied': 'Blocked by browser — allow notifications in browser settings',
+    'settings.notificationsUnsupported': 'Push notifications are not supported by this browser',
     'settings.about': 'About',
     'settings.aboutText': 'View webcams and weather forecasts from your favorite locations',
     'offline.message': 'You are offline',
@@ -332,6 +338,9 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     'settings.pushNotifications': 'Activer les notifications push',
     'settings.weatherAlerts': 'Alertes meteo',
     'settings.notificationsHint': 'Activez les notifications push pour recevoir les alertes et mises a jour meteo',
+    'settings.notificationsGranted': 'Notifications actives',
+    'settings.notificationsDenied': 'Bloque par le navigateur — autorisez les notifications dans les parametres',
+    'settings.notificationsUnsupported': 'Les notifications push ne sont pas supportees par ce navigateur',
     'settings.about': 'A propos',
     'settings.aboutText': 'Affichez les webcams et previsions meteo de vos lieux favoris',
     'offline.message': 'Vous etes hors ligne',

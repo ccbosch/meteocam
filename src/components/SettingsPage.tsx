@@ -1,11 +1,29 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStore } from '@/stores/appStore';
 import { useI18n } from '@/hooks/useI18n';
+import { NotificationService } from '@/services/NotificationService';
 
 const SettingsPage: React.FC = () => {
   const { settings, updateSettings } = useAppStore();
   const { t } = useI18n();
+  const [permission, setPermission] = useState<NotificationPermission | 'unsupported'>(
+    NotificationService.getPermission()
+  );
+
+  useEffect(() => {
+    setPermission(NotificationService.getPermission());
+  }, [settings.notificationsEnabled]);
+
+  const handleNotificationsToggle = async (enabled: boolean) => {
+    if (enabled) {
+      const result = await NotificationService.requestPermission();
+      setPermission(result);
+      updateSettings({ notificationsEnabled: result === 'granted' });
+    } else {
+      updateSettings({ notificationsEnabled: false, weatherAlertsEnabled: false });
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -177,37 +195,50 @@ const SettingsPage: React.FC = () => {
         <div className="card p-6">
           <h2 className="text-xl font-semibold mb-4">{t('settings.notifications')}</h2>
 
-          <div className="space-y-4">
-            <label className="flex items-center justify-between">
-              <span className="text-sm font-medium">{t('settings.pushNotifications')}</span>
-              <input
-                type="checkbox"
-                checked={settings.notificationsEnabled}
-                onChange={(e) =>
-                  updateSettings({ notificationsEnabled: e.target.checked })
-                }
-                className="w-5 h-5"
-              />
-            </label>
-
-            <label className="flex items-center justify-between">
-              <span className="text-sm font-medium">{t('settings.weatherAlerts')}</span>
-              <input
-                type="checkbox"
-                checked={settings.weatherAlertsEnabled}
-                onChange={(e) =>
-                  updateSettings({ weatherAlertsEnabled: e.target.checked })
-                }
-                className="w-5 h-5"
-                disabled={!settings.notificationsEnabled}
-              />
-            </label>
-          </div>
-
-          {!settings.notificationsEnabled && (
-            <p className="text-sm text-gray-500 mt-4">
-              {t('settings.notificationsHint')}
+          {permission === 'unsupported' ? (
+            <p className="text-sm text-yellow-600 dark:text-yellow-400">
+              {t('settings.notificationsUnsupported')}
             </p>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-sm font-medium">{t('settings.pushNotifications')}</span>
+                  {permission === 'denied' && (
+                    <p className="text-xs text-red-500 mt-0.5">{t('settings.notificationsDenied')}</p>
+                  )}
+                  {permission === 'granted' && settings.notificationsEnabled && (
+                    <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">{t('settings.notificationsGranted')}</p>
+                  )}
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings.notificationsEnabled}
+                  onChange={(e) => handleNotificationsToggle(e.target.checked)}
+                  disabled={permission === 'denied'}
+                  className="w-5 h-5"
+                />
+              </div>
+
+              <label className="flex items-center justify-between">
+                <span className="text-sm font-medium">{t('settings.weatherAlerts')}</span>
+                <input
+                  type="checkbox"
+                  checked={settings.weatherAlertsEnabled}
+                  onChange={(e) =>
+                    updateSettings({ weatherAlertsEnabled: e.target.checked })
+                  }
+                  className="w-5 h-5"
+                  disabled={!settings.notificationsEnabled}
+                />
+              </label>
+
+              {!settings.notificationsEnabled && permission !== 'denied' && (
+                <p className="text-sm text-gray-500">
+                  {t('settings.notificationsHint')}
+                </p>
+              )}
+            </div>
           )}
         </div>
 
