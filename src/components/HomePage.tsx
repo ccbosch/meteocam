@@ -14,7 +14,7 @@ import { LocationService } from '@/services/LocationService';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const HomePage: React.FC = () => {
-  const { locations, isLoading } = useLocations();
+  const { locations, isLoading, deleteLocation } = useLocations();
   const { currentView, settings, setCurrentView, setHighlightedLocationId } = useAppStore();
   const { t } = useI18n();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -175,6 +175,8 @@ const HomePage: React.FC = () => {
           onReorder={async (locationIds: string[]) => {
             await LocationService.reorderLocations(locationIds);
           }}
+          onEdit={handleEditLocation}
+          onDelete={(location) => deleteLocation(location.id)}
         />
       )}
 
