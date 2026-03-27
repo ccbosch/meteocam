@@ -163,6 +163,21 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit, onLocatio
                 transition: swipeDistance === 0 ? 'transform 0.3s ease-out' : 'none',
               }}
             />
+            {/* Webcam name overlay */}
+            {currentWebcam?.name && (() => {
+              const stripped = currentWebcam.name
+                .replace(new RegExp(`^${location.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*[-–—|:/]?\\s*`, 'i'), '')
+                .trim();
+              const displayName = stripped || currentWebcam.name;
+              return (
+                <div className="absolute bottom-0 left-0 pointer-events-none">
+                  <span className="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                    {displayName}
+                  </span>
+                </div>
+              );
+            })()}
+
             {/* Swipe visual feedback */}
             {location.webcamUrls.length > 1 && Math.abs(swipeDistance) > 10 && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
