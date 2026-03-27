@@ -220,7 +220,7 @@ const WebcamPlayer: React.FC<WebcamPlayerProps> = ({ webcam, className, style })
     case 'mp4':
       return <Mp4Player webcam={webcam} className={className} style={style} />;
     case 'embed':
-      return <EmbedPlayer webcam={webcam} className={className} />;
+      return <EmbedPlayer webcam={webcam} />;
     default:
       return <ImagePlayer webcam={webcam} className={className} style={style} />;
   }
