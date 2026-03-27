@@ -329,12 +329,13 @@ const LocationModal: React.FC<LocationModalProps> = ({ mode, isOpen, onClose, lo
             <label className="block text-sm font-medium">{t('add.foundNearby')}</label>
             <span className="text-xs text-gray-500">{t('add.foundCount', { count: foundWebcams.length })}</span>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 max-h-72 overflow-y-auto space-y-2 border dark:border-gray-700 rounded-lg p-3">
               {foundWebcams.map((webcam, index) => (
                 <div
                   key={`${webcam.url}-${index}`}
                   onMouseEnter={() => setPreviewWebcam(webcam.url)}
+                  onClick={() => setPreviewWebcam(prev => prev === webcam.url ? null : webcam.url)}
                   className={`flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors cursor-pointer ${
                     previewWebcam === webcam.url ? 'ring-2 ring-primary-500' : ''
                   }`}
@@ -354,7 +355,7 @@ const LocationModal: React.FC<LocationModalProps> = ({ mode, isOpen, onClose, lo
                 </div>
               ))}
             </div>
-            <div className="w-48 flex-shrink-0 border dark:border-gray-700 rounded-lg overflow-hidden flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-700">
+            <div className="sm:w-48 w-full h-40 sm:h-auto flex-shrink-0 border dark:border-gray-700 rounded-lg overflow-hidden flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-700">
               {previewWebcam ? (
                 <img
                   key={previewWebcam}
