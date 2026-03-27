@@ -10,10 +10,13 @@ export interface Location {
   order: number;
 }
 
+export type WebcamType = 'image' | 'mjpeg' | 'hls' | 'mp4' | 'embed';
+
 export interface WebcamSource {
   id: string;
   url: string;
   name?: string;
+  type?: WebcamType;
   refreshInterval?: number; // in milliseconds
   lastFetched?: Date;
 }

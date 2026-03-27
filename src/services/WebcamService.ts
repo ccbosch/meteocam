@@ -3,6 +3,23 @@ import { WebcamSnapshot } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 export class WebcamService {
+  static detectType(url: string): import('@/types').WebcamType {
+    if (!url) return 'image';
+    const lower = url.toLowerCase().split('?')[0];
+    if (
+      lower.endsWith('.mjpg') ||
+      lower.endsWith('.mjpeg') ||
+      lower.includes('action=stream') ||
+      lower.includes('video.cgi') ||
+      lower.includes('videostream.cgi') ||
+      lower.includes('?stream') ||
+      lower.includes('/stream')
+    ) return 'mjpeg';
+    if (lower.endsWith('.m3u8')) return 'hls';
+    if (lower.endsWith('.mp4') || lower.endsWith('.webm') || lower.endsWith('.ogg')) return 'mp4';
+    return 'image';
+  }
+
   static async fetchWebcamImage(url: string): Promise<Blob> {
     const response = await fetch(url, {
       mode: 'cors',

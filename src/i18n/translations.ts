@@ -62,6 +62,7 @@ export type TranslationKey =
   | 'list.sortDateDesc'
   | 'list.sortCustom'
   | 'location.webcamUnavailable'
+  | 'location.embeddedView'
   | 'location.weatherUnavailable'
   | 'location.feelsLike'
   | 'location.humidity'
@@ -209,6 +210,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     'list.sortDateDesc': 'Newest first',
     'list.sortCustom': 'Custom order',
     'location.webcamUnavailable': 'Webcam unavailable',
+    'location.embeddedView': 'Embedded view',
     'location.weatherUnavailable': 'Weather data unavailable',
     'location.feelsLike': 'Feels like',
     'location.humidity': 'Humidity',
@@ -355,6 +357,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     'list.sortDateDesc': 'Plus recents',
     'list.sortCustom': 'Ordre personnalise',
     'location.webcamUnavailable': 'Webcam indisponible',
+    'location.embeddedView': 'Vue integree',
     'location.weatherUnavailable': 'Donnees meteo indisponibles',
     'location.feelsLike': 'Ressenti',
     'location.humidity': 'Humidite',

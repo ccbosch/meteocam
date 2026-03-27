@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Location } from '@/types';
 import { useWeather } from '@/hooks/useWeather';
-import { useWebcam } from '@/hooks/useWebcam';
 import { useAppStore } from '@/stores/appStore';
 import { WeatherService } from '@/services/WeatherService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useI18n } from '@/hooks/useI18n';
+import WebcamPlayer from '@/components/WebcamPlayer';
 
 interface LocationCardProps {
   location: Location;
@@ -63,11 +63,6 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit, onLocatio
     },
   ];
   const currentWebcam = location.webcamUrls[currentWebcamIndex];
-  
-  const { imageUrl, isLoading: webcamLoading, error: webcamError } = useWebcam(
-    currentWebcam?.url || '',
-    currentWebcam?.refreshInterval || settings.defaultRefreshInterval
-  );
 
   const nextWebcam = () => {
     setCurrentWebcamIndex((prev) => (prev + 1) % location.webcamUrls.length);
@@ -135,28 +130,10 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit, onLocatio
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {webcamLoading && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-          </div>
-        )}
-        
-        {webcamError && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center p-4">
-              <svg className="w-12 h-12 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p className="text-sm text-gray-500">{t('location.webcamUnavailable')}</p>
-            </div>
-          </div>
-        )}
-        
-        {imageUrl && !webcamLoading && (
+        {currentWebcam && (
           <>
-            <img
-              src={imageUrl}
-              alt={`Webcam view of ${location.name}`}
+            <WebcamPlayer
+              webcam={currentWebcam}
               className="w-full h-full object-cover"
               style={{
                 transform: swipeDistance !== 0 ? `translateX(${-swipeDistance * 0.3}px)` : 'none',
@@ -443,28 +420,10 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onEdit, onLocatio
                       onTouchMove={onTouchMove}
                       onTouchEnd={onTouchEnd}
                     >
-                      {webcamLoading && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-                        </div>
-                      )}
-                      
-                      {webcamError && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-center p-4">
-                            <svg className="w-12 h-12 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <p className="text-sm text-gray-500">{t('location.webcamUnavailable')}</p>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {imageUrl && !webcamLoading && (
+                      {currentWebcam && (
                         <>
-                          <img
-                            src={imageUrl}
-                            alt={`Webcam view of ${location.name}`}
+                          <WebcamPlayer
+                            webcam={currentWebcam}
                             className="w-full h-auto block max-h-64 md:max-h-80 object-contain"
                             style={{
                               transform: swipeDistance !== 0 ? `translateX(${-swipeDistance * 0.3}px)` : 'none',

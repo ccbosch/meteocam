@@ -5,8 +5,7 @@ import { useAppStore } from '@/stores/appStore';
 import LocationCard from './LocationCard';
 import LocationList from './LocationList';
 import MapView from './MapView';
-import AddLocationModal from './AddLocationModal';
-import EditLocationModal from './EditLocationModal';
+import LocationModal from './LocationModal';
 import EmptyState from './EmptyState';
 import { useI18n } from '@/hooks/useI18n';
 import { db } from '@/db/schema';
@@ -69,8 +68,8 @@ const HomePage: React.FC = () => {
   };
 
   const handleEditSaved = () => {
-    // LocationService.updateLocation already updated the DB
-    // useLocations hook will automatically refetch
+    // Increment refreshKey to remount LocationCards with updated webcam data
+    setRefreshKey(prev => prev + 1);
   };
 
   const handleRefreshAll = async () => {
@@ -104,7 +103,8 @@ const HomePage: React.FC = () => {
     return (
       <>
         <EmptyState onAddLocation={() => setIsAddModalOpen(true)} />
-        <AddLocationModal
+        <LocationModal
+          mode="add"
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
         />
@@ -188,12 +188,14 @@ const HomePage: React.FC = () => {
         />
       )}
 
-      <AddLocationModal
+      <LocationModal
+        mode="add"
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
       />
 
-      <EditLocationModal
+      <LocationModal
+        mode="edit"
         isOpen={isEditModalOpen}
         location={editingLocation}
         onClose={() => {
