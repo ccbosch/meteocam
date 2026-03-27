@@ -39,6 +39,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
   const [webcamSuggestions, setWebcamSuggestions] = useState<string[]>([]);
   const [isLocatingGPS, setIsLocatingGPS] = useState(false);
   const [hasTriedAutoLocate, setHasTriedAutoLocate] = useState(false);
+  const [previewWebcam, setPreviewWebcam] = useState<string | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -319,6 +320,7 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
     setIsSearchingWebcams(false);
     setIsLocatingGPS(false);
     setHasTriedAutoLocate(false);
+    setPreviewWebcam(null);
     onClose();
   };
 
@@ -646,26 +648,49 @@ const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onClose }) 
                     <label className="block text-sm font-medium">{t('add.foundNearby')}</label>
                     <span className="text-xs text-gray-500">{t('add.foundCount', { count: foundWebcams.length })}</span>
                   </div>
-                  <div className="max-h-48 overflow-y-auto space-y-2 border dark:border-gray-700 rounded-lg p-3">
-                    {foundWebcams.map((webcam, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{webcam.name}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{webcam.source}</p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => addFoundWebcam(webcam)}
-                          className="ml-2 px-3 py-1 text-xs bg-primary-600 hover:bg-primary-700 text-white rounded transition-colors"
-                          disabled={webcamUrls.some(w => w.url === webcam.url)}
+                  <div className="flex gap-3">
+                    <div className="flex-1 max-h-72 overflow-y-auto space-y-2 border dark:border-gray-700 rounded-lg p-3">
+                      {foundWebcams.map((webcam, index) => (
+                        <div
+                          key={index}
+                          onMouseEnter={() => setPreviewWebcam(webcam.url)}
+                          className={`flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors cursor-pointer ${
+                            previewWebcam === webcam.url ? 'ring-2 ring-primary-500' : ''
+                          }`}
                         >
-                          {webcamUrls.some(w => w.url === webcam.url) ? `✓ ${t('add.added')}` : `+ ${t('add.add')}`}
-                        </button>
-                      </div>
-                    ))}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{webcam.name}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{webcam.source}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => addFoundWebcam(webcam)}
+                            className="ml-2 px-3 py-1 text-xs bg-primary-600 hover:bg-primary-700 text-white rounded transition-colors flex-shrink-0"
+                            disabled={webcamUrls.some(w => w.url === webcam.url)}
+                          >
+                            {webcamUrls.some(w => w.url === webcam.url) ? `✓ ${t('add.added')}` : `+ ${t('add.add')}`}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="w-48 flex-shrink-0 border dark:border-gray-700 rounded-lg overflow-hidden flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-700">
+                      {previewWebcam ? (
+                        <img
+                          key={previewWebcam}
+                          src={previewWebcam}
+                          alt="Webcam preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.replaceWith(Object.assign(document.createElement('p'), {
+                              className: 'text-xs text-gray-400 text-center p-2',
+                              textContent: 'Preview unavailable',
+                            }));
+                          }}
+                        />
+                      ) : (
+                        <p className="text-xs text-gray-400 text-center p-3">Hover a webcam to preview</p>
+                      )}
+                    </div>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     💡 {t('add.quickAddHint')}
